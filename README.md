@@ -2,20 +2,6 @@
 
 COMPSCI 485 NLP final project for multiclass classification of `manipulation_type` from synthetic conversation text.
 
-## Project Layout
-
-```text
-data/
-  raw/                  # Place downloaded Kaggle JSON/JSONL files here
-  processed/            # Cleaned or feature-ready data outputs
-notebooks/              # Exploration only
-src/                    # Reusable Python code
-results/
-  metrics/              # Evaluation summaries
-  predictions/          # Model predictions and error examples
-figures/                # Saved plots
-report/                 # Report drafts and final writing
-```
 
 ## Setup
 
@@ -36,16 +22,10 @@ The loader supports either:
 
 ## Run The Loader
 
-Auto-detect the first `.json` or `.jsonl` file in `data/raw/`:
+The loader uses the hardcoded raw dataset path `data/raw/manipulational_conversation.json`:
 
 ```bash
 python src/load_data.py
-```
-
-Or pass a specific file:
-
-```bash
-python src/load_data.py --input data/raw/manipulational_conversation.json
 ```
 
 If your shell does not define `python`, use `python3` for these commands.
