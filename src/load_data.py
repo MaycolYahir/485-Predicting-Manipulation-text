@@ -6,12 +6,6 @@ from typing import Any
 
 import pandas as pd
 
-try:
-    from .utils import project_path
-except ImportError:
-    from utils import project_path
-
-
 OUTPUT_COLUMNS = [
     "conversation_id",
     "text",
@@ -24,12 +18,12 @@ OUTPUT_COLUMNS = [
     "denial_count",
 ]
 
-RAW_DATA_FILE = project_path("data", "raw", "manipulational_conversation.json")
+RAW_DATA_FILE = Path("data/raw/manipulational_conversation.json")
 
 
 def load_raw_json(file_path: str | Path) -> list[dict[str, Any]]:
 
-    #Load a raw dataset
+    # Load a raw dataset
     path = Path(file_path)
     raw_text = path.read_text(encoding="utf-8").strip()
 
@@ -70,7 +64,7 @@ def load_raw_json(file_path: str | Path) -> list[dict[str, Any]]:
 
 def flatten_messages(messages: list[dict[str, Any]] | None) -> str:
 
-    #Flatten message dictionaries into one speaker
+    # flatten message dictionaries into one speaker
 
     if not messages:
         return "No message enter a message"

@@ -7,13 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-MPLCONFIG_DIR = PROJECT_ROOT / ".matplotlib"
-XDG_CACHE_DIR = PROJECT_ROOT / ".cache"
-MPLCONFIG_DIR.mkdir(exist_ok=True)
-XDG_CACHE_DIR.mkdir(exist_ok=True)
-os.environ.setdefault("MPLCONFIGDIR", str(MPLCONFIG_DIR))
-os.environ.setdefault("XDG_CACHE_HOME", str(XDG_CACHE_DIR))
+
 
 import matplotlib
 
@@ -23,41 +17,45 @@ import matplotlib.pyplot as plt
 
 try:
     from .load_data import find_default_raw_file, load_dataset
-    from .utils import ensure_dir, project_path
+    from .utils import ensure_dir
 except ImportError:
     from load_data import find_default_raw_file, load_dataset
-    from utils import ensure_dir, project_path
+    from utils import ensure_dir
 
 
+# total convo
 def total_conversations(df: pd.DataFrame) -> int:
 
-    """Return the total number of conversations."""
+    
 
     return len(df)
 
-
+# counts of manipulation type for each label
 def manipulation_type_counts(df: pd.DataFrame) -> pd.Series:
-    """Return counts for each manipulation_type label."""
+    
     return df["manipulation_type"].value_counts(dropna=False)
 
 
+# return proportions the ratio for for non and manipulative
 def manipulation_proportions(df: pd.DataFrame) -> pd.Series:
-    """Return proportions for manipulated vs non-manipulated examples."""
+    
     return df["is_manipulation"].value_counts(normalize=True, dropna=False)
 
-
+# Return the average conversation_length
 def average_conversation_length(df: pd.DataFrame) -> float:
-    """Return the average conversation_length."""
+
+    
     return float(pd.to_numeric(df["conversation_length"], errors="coerce").mean())
 
-
+# Return the average total word count per conversation
 def average_word_count_total(df: pd.DataFrame) -> float:
-    """Return the average total word count per conversation."""
+
+    
     return float(pd.to_numeric(df["word_count_total"], errors="coerce").mean())
 
-
+ # the average number of messages per conversation from flattened text
 def average_messages_per_conversation(df: pd.DataFrame) -> float:
-    """Estimate the average number of messages per conversation from flattened text."""
+   
     if "text" not in df:
         return average_conversation_length(df)
 
@@ -69,14 +67,14 @@ def average_messages_per_conversation(df: pd.DataFrame) -> float:
 
     return float(message_counts.mean())
 
-
+ # Return the average flattened text length in characters
 def average_text_length_chars(df: pd.DataFrame) -> float:
-    """Return the average flattened text length in characters."""
+    
     return float(df["text"].fillna("").astype(str).str.len().mean())
 
-
+# Build a compact summary table for report and result files 
 def data_summary_table(df: pd.DataFrame) -> pd.DataFrame:
-    """Build a compact summary table for report and result files."""
+  
     label_counts = manipulation_type_counts(df)
     proportions = manipulation_proportions(df)
 
@@ -102,7 +100,7 @@ def data_summary_table(df: pd.DataFrame) -> pd.DataFrame:
 def save_summary_table(
         
     df: pd.DataFrame,
-    output_path: str | Path = project_path("results", "metrics", "data_summary.csv"),
+    output_path: str | Path = Path("results/metrics/data_summary.csv"),
 ) -> Path:
     """Save the summary table to CSV."""
     output_path = Path(output_path)
@@ -113,9 +111,9 @@ def save_summary_table(
 
 def plot_label_distribution(
     df: pd.DataFrame,
-    output_path: str | Path = project_path("figures", "label_distribution.png"),
+    output_path: str | Path = Path("figures/label_distribution.png"),
 ) -> Path:
-    """Create and save a bar chart of manipulation_type counts."""
+    
     output_path = Path(output_path)
     ensure_dir(output_path.parent)
 
