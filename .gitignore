@@ -42,6 +42,8 @@ results/predictions/*
 figures/*
 !results/metrics/.gitkeep
 !results/metrics/data_summary.csv
+!results/metrics/majority_baseline.json
 !results/predictions/.gitkeep
+!results/predictions/majority_baseline_predictions.csv
 !figures/.gitkeep
 !figures/label_distribution.png

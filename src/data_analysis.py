@@ -1,5 +1,3 @@
-"""Exploratory data analysis helpers for the manipulation dataset."""
-
 from __future__ import annotations
 
 import os
@@ -7,20 +5,16 @@ from pathlib import Path
 
 import pandas as pd
 
-
+from .load_data import find_default_raw_file, load_dataset
+from .utils import ensure_dir
+from load_data import find_default_raw_file, load_dataset
+from utils import ensure_dir
 
 import matplotlib
-
 matplotlib.use("Agg")
-
 import matplotlib.pyplot as plt
 
-try:
-    from .load_data import find_default_raw_file, load_dataset
-    from .utils import ensure_dir
-except ImportError:
-    from load_data import find_default_raw_file, load_dataset
-    from utils import ensure_dir
+
 
 
 # total convo
@@ -102,7 +96,7 @@ def save_summary_table(
     df: pd.DataFrame,
     output_path: str | Path = Path("results/metrics/data_summary.csv"),
 ) -> Path:
-    """Save the summary table to CSV."""
+  
     output_path = Path(output_path)
     ensure_dir(output_path.parent)
     data_summary_table(df).to_csv(output_path, index=False)
