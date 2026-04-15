@@ -7,8 +7,7 @@ import pandas as pd
 
 from .load_data import find_default_raw_file, load_dataset
 from .utils import ensure_dir
-from load_data import find_default_raw_file, load_dataset
-from utils import ensure_dir
+
 
 import matplotlib
 matplotlib.use("Agg")

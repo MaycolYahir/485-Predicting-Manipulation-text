@@ -1,0 +1,107 @@
+{
+  "model": "text_only_multinomial_nb",
+  "data_source": "load_dataset() with exact text deduplication before split",
+  "target_column": "manipulation_type",
+  "text_column": "text",
+  "random_seed": 42,
+  "test_size_fraction": 0.2,
+  "total_examples_before_deduplication": 10000,
+  "duplicate_text_rows_removed_before_split": 1545,
+  "total_examples": 8455,
+  "train_size": 6764,
+  "test_size": 1691,
+  "number_of_classes": 7,
+  "majority_class_baseline_accuracy_on_same_split": 0.16499112950916617,
+  "processed_deduped_data_path": "data/processed/deduped_conversations.csv",
+  "message_overlap_diagnostic": {
+    "unique_train_message_lines": 1332,
+    "unique_test_message_lines": 1092,
+    "shared_message_lines_across_train_test": 1078,
+    "test_rows_with_at_least_one_shared_message_line": 1691,
+    "test_fraction_with_shared_message_line": 1.0,
+    "sample_shared_message_lines": [
+      "A: A good child would help",
+      "A: After everything I've done for you, you can't do this one thing?",
+      "A: Are you feeling okay?",
+      "A: Are you sure about that?",
+      "A: As usual, it's all on me",
+      "A: At least I know where I stand now",
+      "A: Barely. Without me, you'd have nothing.",
+      "A: But I made special plans for us. I've been thinking about you all day.",
+      "A: Call it what you want. Your reputation is in my hands.",
+      "A: Can you send me the report when you get a chance?",
+      "A: Cancel your plans tonight. I need to see you.",
+      "A: Decide now",
+      "A: Did you see the game last night?",
+      "A: Did you? I must have missed that.",
+      "A: Do as you're told",
+      "A: Do what I say or I'll make sure no one talks to you again.",
+      "A: Do what you want",
+      "A: Don't make me do something",
+      "A: Don't worry about me",
+      "A: Don't worry about me. You go enjoy yourself.",
+      "A: Don't worry, I'm used to it",
+      "A: Don't you feel the same? I thought we had something special.",
+      "A: Don't you like them? I put so much thought into each one.",
+      "A: Everyone else is boring compared to you",
+      "A: Everyone else is so boring compared to you."
+    ]
+  },
+  "features": {
+    "type": "tfidf",
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 2,
+    "max_df": 0.95,
+    "max_features": 5000
+  },
+  "classifier": "MultinomialNB",
+  "accuracy": 1.0,
+  "macro_f1": 1.0,
+  "class_metrics": {
+    "charm_flattery": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 233
+    },
+    "direct_coercion": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 236
+    },
+    "gaslighting": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 233
+    },
+    "guilt_tripping": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 238
+    },
+    "love_bombing": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 237
+    },
+    "neutral": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 279
+    },
+    "passive_aggressive": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 235
+    }
+  }
+}

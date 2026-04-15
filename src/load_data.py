@@ -18,7 +18,9 @@ OUTPUT_COLUMNS = [
     "denial_count",
 ]
 
-RAW_DATA_FILE = Path("data/raw/manipulational_conversation.json")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+RAW_DATA_FILE = PROJECT_ROOT / "data/raw/manipulational_conversation.json"
+DEDUPED_DATA_FILE = PROJECT_ROOT / "data/processed/deduped_conversations.csv"
 
 
 def load_raw_json(file_path: str | Path) -> list[dict[str, Any]]:
@@ -54,6 +56,10 @@ def load_raw_json(file_path: str | Path) -> list[dict[str, Any]]:
                 raise ValueError(f"Invalid JSON on line {line_number} of {path}") from exc
             
         return records
+
+    if isinstance(data, list):
+
+        return data
 
     if isinstance(data, dict):
 
@@ -106,6 +112,24 @@ def load_dataset() -> pd.DataFrame:
     return build_dataframe(records)
 
 
+def deduplicate_conversations(df: pd.DataFrame) -> pd.DataFrame:
+
+    return df.drop_duplicates(subset=["text"]).reset_index(drop=True)
+
+
+def load_deduped_dataset() -> pd.DataFrame:
+
+    return deduplicate_conversations(load_dataset())
+
+
+def save_deduped_dataset() -> Path:
+
+    df = load_deduped_dataset()
+    DEDUPED_DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(DEDUPED_DATA_FILE, index=False)
+    return DEDUPED_DATA_FILE
+
+
 def find_default_raw_file() -> Path:
 
     return RAW_DATA_FILE
@@ -119,6 +143,13 @@ def main() -> None:
     print(f"Loaded file: {input_path}")
 
     print(f"Number of rows: {len(df)}")
+
+    deduped_df = deduplicate_conversations(df)
+    deduped_path = save_deduped_dataset()
+
+    print(f"Unique text rows after deduplication: {len(deduped_df)}")
+    print(f"Removed exact duplicate text rows: {len(df) - len(deduped_df)}")
+    print(f"Saved deduped dataset to: {deduped_path}")
 
     print(f"Columns: {list(df.columns)}")
 

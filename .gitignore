@@ -35,6 +35,7 @@ data/raw/*
 data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+!data/processed/deduped_conversations.csv
 
 # Generated outputs
 results/metrics/*
@@ -43,7 +44,12 @@ figures/*
 !results/metrics/.gitkeep
 !results/metrics/data_summary.csv
 !results/metrics/majority_baseline.json
+!results/metrics/text_only_multinomial_nb.json
+!results/metrics/message_overlap_diagnostic.json
 !results/predictions/.gitkeep
 !results/predictions/majority_baseline_predictions.csv
+!results/predictions/text_only_multinomial_nb_predictions.csv
+!results/predictions/manual_example_predictions.csv
 !figures/.gitkeep
 !figures/label_distribution.png
+!figures/text_only_model_comparison.png

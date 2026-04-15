@@ -6,8 +6,13 @@ from pathlib import Path
 import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
-from .load_data import load_dataset
-from .utils import ensure_dir
+
+try:
+    from .load_data import load_dataset
+    from .utils import ensure_dir
+except ImportError:
+    from load_data import load_dataset
+    from utils import ensure_dir
 
 
 
@@ -31,15 +36,18 @@ def run_majority_baseline(df: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
 
     text_column = validate_dataframe(df)
 
-    clean_df = df.dropna(subset=[LABEL_COLUMN]).copy()
+    clean_df = df.dropna(subset=[LABEL_COLUMN, text_column]).copy()
 
     clean_df[LABEL_COLUMN] = clean_df[LABEL_COLUMN].astype(str)
+    clean_df[text_column] = clean_df[text_column].astype(str)
+
+    total_examples_before_deduplication = len(clean_df)
+    duplicate_text_rows = int(clean_df.duplicated(subset=[text_column]).sum())
+    clean_df = clean_df.drop_duplicates(subset=[text_column]).copy()
 
     label_counts = clean_df[LABEL_COLUMN].value_counts()
 
-    if label_counts.empty:
 
-        raise ValueError("No examples remain after dropping missing labels.")
 
     train_df, test_df = train_test_split(
         clean_df,
@@ -63,11 +71,13 @@ def run_majority_baseline(df: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
 
     metrics = {
         "model": "majority_class_baseline",
-        "data_source": "load_dataset()",
+        "data_source": "load_dataset() with exact text deduplication before split",
         "target_column": LABEL_COLUMN,
         "text_column": text_column,
         "random_seed": 42,
         "test_size_fraction": 0.2,
+        "total_examples_before_deduplication": int(total_examples_before_deduplication),
+        "duplicate_text_rows_removed_before_split": int(duplicate_text_rows),
         "total_examples": int(len(clean_df)),
         "train_size": int(len(train_df)),
         "test_size": int(len(test_df)),
@@ -121,8 +131,9 @@ def save_predictions(predictions: pd.DataFrame, output_path: str | Path = Path("
 def progress_report_paragraph(metrics: dict) -> str:
     
     return (
-        "For the initial processing baseline, we used an 80/20 stratified "
-        "train/test split with a fixed random seed. The majority-class baseline "
+        "For the initial processing baseline, we removed exact duplicate flattened "
+        "conversations and used an 80/20 stratified train/test split with a fixed "
+        "random seed. The majority-class baseline "
         f"always predicted the most frequent training label, "
         f"{metrics['majority_class']!r}. On the test set, this baseline reached "
         f"{metrics['accuracy']:.4f} accuracy and {metrics['macro_f1']:.4f} macro F1. "
