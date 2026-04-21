@@ -1,0 +1,100 @@
+{
+  "title": "Debugging Summary for Suspicious Perfect Text-Only Model Performance",
+  "project": "Detecting Psychological Manipulation Types in Synthetic Conversations",
+  "date_created": "2026-04-15",
+  "short_version": "The text-only TF-IDF + Multinomial Naive Bayes model still gets perfect test accuracy after removing exact duplicate conversations. The pipeline checks did not find obvious evaluation bugs, but the dataset appears heavily synthetic/template-based. All test examples share at least one message-level line with the training set, and manual examples show weaker generalization.",
+  "original_problem": {
+    "symptom": "TF-IDF + Multinomial Naive Bayes achieved 100% accuracy on the multiclass manipulation_type task.",
+    "why_this_was_suspicious": "A simple text-only Naive Bayes model should not normally get perfect performance on a seven-class NLP task unless the data is extremely easy, leaked, duplicated, or evaluated incorrectly.",
+    "intended_model": {
+      "input_features": "Only flattened conversation text",
+      "target": "manipulation_type",
+      "vectorizer": "TF-IDF",
+      "ngram_range": [1, 2],
+      "min_df": 2,
+      "max_df": 0.95,
+      "max_features": 5000,
+      "classifier": "MultinomialNB",
+      "split": "Stratified 80/20 train/test split",
+      "random_state": 42
+    }
+  },
+  "bugs_and_leakage_checks": {
+    "checked_for_training_on_test_data": true,
+    "checked_for_predicting_on_training_data": true,
+    "checked_for_accuracy_score_y_test_y_test": true,
+    "checked_for_vectorizing_all_rows_before_split": true,
+    "checked_for_target_column_in_features": true,
+    "checked_for_metadata_columns_in_text_model": true,
+    "checked_for_label_names_inside_text": true,
+    "checked_for_conversation_id_inside_text": true,
+    "checked_for_train_test_index_overlap": true,
+    "checked_for_exact_duplicate_text_overlap": true,
+    "result": "No obvious fit/predict/evaluation bug was found. The model is fit on x_train/y_train and predicts on x_test. The input is the text column only."
+  },
+  "main_findings": {
+    "raw_dataset_rows": 10000,
+    "deduplicated_text_rows": 8455,
+    "exact_duplicate_text_rows_removed": 1545,
+    "train_size_after_deduplication": 6764,
+    "test_size_after_deduplication": 1691,
+    "train_test_index_overlap": 0,
+    "exact_duplicate_texts_across_train_test": 0,
+    "test_rows_whose_exact_text_appears_in_train": 0,
+    "unique_train_message_lines": 1332,
+    "unique_test_message_lines": 1092,
+    "shared_message_lines_across_train_test": 1078,
+    "test_rows_with_at_least_one_shared_message_line": 1691,
+    "test_fraction_with_shared_message_line": 1.0,
+    "interpretation": "Exact duplicate full conversations were removed successfully, but message-level template overlap remains. The synthetic dataset appears to reuse many label-specific speaker lines and templates across train and test."
+  },
+  "model_results_after_cleanup": {
+    "majority_baseline": {
+      "accuracy": 0.16499112950916617,
+      "macro_f1": 0.04046410442349529,
+      "majority_class": "neutral"
+    },
+    "tfidf_multinomial_nb": {
+      "accuracy": 1.0,
+      "macro_f1": 1.0,
+      "note": "Perfect performance remained even after removing exact duplicate full conversations."
+    }
+  },
+  "manual_example_sanity_check": {
+    "purpose": "Test whether the model generalizes to hand-written examples that are not copied from the synthetic dataset.",
+    "total_manual_examples": 7,
+    "matched_expected_label": 5,
+    "missed_examples": [
+      {
+        "example_id": "manual_coercion_01",
+        "expected_label": "direct_coercion",
+        "predicted_label": "neutral",
+        "predicted_confidence": 0.6820022995403888
+      },
+      {
+        "example_id": "manual_passive_01",
+        "expected_label": "passive_aggressive",
+        "predicted_label": "guilt_tripping",
+        "predicted_confidence": 0.6352154047811867
+      }
+    ],
+    "interpretation": "The model performs perfectly on the synthetic held-out split but makes mistakes on manually written examples. This supports the concern that the synthetic benchmark is easier than real-world generalization."
+  },
+  "files_created_or_updated": {
+    "processed_data": "data/processed/deduped_conversations.csv",
+    "naive_bayes_code": "src/naivebayes.py",
+    "majority_baseline_code": "src/majority_baseline.py",
+    "loader_code": "src/load_data.py",
+    "nb_metrics": "results/metrics/text_only_multinomial_nb.json",
+    "majority_metrics": "results/metrics/majority_baseline.json",
+    "message_overlap_diagnostic": "results/metrics/message_overlap_diagnostic.json",
+    "manual_predictions": "results/predictions/manual_example_predictions.csv",
+    "limitation_notes": "report/dataset_limitations.md"
+  },
+  "report_language": {
+    "concise_paragraph": "Our initial text-only TF-IDF + Multinomial Naive Bayes model achieved perfect test accuracy, which was suspicious for a seven-class NLP classification task. We added checks for common evaluation errors, including train/test overlap, fitting on the full dataset, predicting on the training set, target leakage in the text column, and accidental use of metadata features. We found no obvious evaluation bug, but the synthetic dataset contained 1,545 exact duplicate flattened conversations. After removing these duplicates, the model still achieved perfect accuracy. A further diagnostic showed that every test example contained at least one individual message line also present in the training set. This suggests that model performance is inflated by repeated synthetic generation templates rather than true real-world generalization.",
+    "limitation_sentence": "Because the dataset is synthetic and contains repeated label-specific templates, model performance should be interpreted as performance on this synthetic benchmark, not as evidence that the model can reliably detect manipulation in real conversations.",
+    "next_steps_sentence": "Next, we will compare additional models such as Logistic Regression and metadata-based classifiers, while clearly reporting deduplication, template-overlap diagnostics, and manual-example sanity checks."
+  },
+  "final_takeaway": "The project is still usable, but the claim needs to shift from 'we built a real manipulation detector' to 'we evaluated manipulation-type classifiers on a synthetic dataset and found evidence that high performance is driven by synthetic template artifacts.'"
+}
