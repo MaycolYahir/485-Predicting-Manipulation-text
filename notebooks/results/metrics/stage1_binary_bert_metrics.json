@@ -1,6 +1,7 @@
 {
-  "model": "text_only_multinomial_nb",
+  "model": "bert_sequence_classifier",
   "stage": "stage1_binary",
+  "dataset_config": "mentalmanip_maj",
   "data_source": "MentalManip with exact text deduplication before split",
   "target_column": "manipulation_type",
   "text_column": "text",
@@ -17,32 +18,29 @@
   "number_of_classes_after_cleaning": 2,
   "smallest_class_size_after_cleaning": 1182,
   "number_of_classes": 2,
-  "features": {
-    "type": "tfidf",
-    "ngram_range": [
-      1,
-      2
-    ],
-    "min_df": 2,
-    "max_df": 0.95,
-    "max_features": 5000,
-    "stop_words": "english"
-  },
-  "classifier": "MultinomialNB",
-  "accuracy": 0.68,
-  "macro_f1": 0.5135114590855536,
-  "weighted_f1": 0.6301957356238836,
+  "model_name": "distilbert-base-uncased",
+  "tokenizer_name": "distilbert-base-uncased",
+  "device": "mps",
+  "max_length": 128,
+  "num_train_epochs": 1,
+  "learning_rate": 5e-05,
+  "weight_decay": 0.01,
+  "per_device_train_batch_size": 16,
+  "per_device_eval_batch_size": 16,
+  "accuracy": 0.70375,
+  "macro_f1": 0.413059427732942,
+  "weighted_f1": 0.5824137931034482,
   "class_metrics": {
     "manipulative": {
-      "precision": 0.71875,
-      "recall": 0.8971631205673759,
-      "f1_score": 0.7981072555205048,
+      "precision": 0.704630788485607,
+      "recall": 0.99822695035461,
+      "f1_score": 0.826118855465884,
       "support": 564
     },
     "non_manipulative": {
-      "precision": 0.3958333333333333,
-      "recall": 0.16101694915254236,
-      "f1_score": 0.2289156626506024,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
       "support": 236
     }
   },
@@ -53,17 +51,17 @@
     ],
     "matrix": [
       [
-        506,
-        58
+        563,
+        1
       ],
       [
-        198,
-        38
+        236,
+        0
       ]
     ],
     "manageable_for_display": true
   },
-  "precision": 0.71875,
-  "recall": 0.8971631205673759,
-  "f1": 0.7981072555205048
+  "precision": 0.704630788485607,
+  "recall": 0.99822695035461,
+  "f1": 0.826118855465884
 }

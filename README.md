@@ -52,6 +52,14 @@ Current implemented baselines:
 - majority-class baseline
 - TF-IDF + Multinomial Naive Bayes
 
+The BERT pipeline is configured for faster local iteration by default:
+
+- `distilbert-base-uncased`
+- `max_length=128`
+- `num_train_epochs=1`
+- `per_device_train_batch_size=16`
+- `per_device_eval_batch_size=16`
+
 ## Run The Notebooks
 
 ```bash
