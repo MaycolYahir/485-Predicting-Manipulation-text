@@ -125,9 +125,10 @@ def build_model() -> Pipeline:
                     min_df=2,
                     max_df=0.95,
                     max_features=5000,
+                    stop_words="english"
                 ),
             ),
-            ("classifier", MultinomialNB()),
+            ("classifier", MultinomialNB(class_prior=[0.5, 0.5])),
         ]
     )
 

@@ -1,165 +1,165 @@
+"""
+load_data.py  —  MentalManip (HuggingFace) version
+Replaces the old Kaggle JSON loader.
+
+Dataset: audreyeleven/MentalManip
+  Subsets available: "mentalmanip_maj"  (4 000 rows, majority-vote labels)  ← recommended
+                     "mentalmanip_con"  (2 920 rows, consensus labels)
+                     "mentalmanip_detailed" (4 000 rows, raw per-annotator data)
+
+Output columns (matches what majority_baseline.py and naivebayes.py expect):
+  text              – the dialogue string (renamed from 'dialogue')
+  manipulation_type – the label we classify on (see TASK below)
+  manipulative      – raw binary flag kept for reference (1 = manipulative)
+  technique         – raw comma-separated technique string kept for reference
+  vulnerability     – raw comma-separated vulnerability string kept for reference
+
+TASK options (set TASK constant below):
+  "binary"    → manipulation_type = "manipulative" / "non_manipulative"   (2 classes)
+  "technique" → manipulation_type = first/primary technique on manipulative
+                examples only; non-manipulative rows are dropped            (N classes)
+"""
+
 from __future__ import annotations
 
-import json
 from pathlib import Path
-from typing import Any
+from typing import Literal
 
 import pandas as pd
+from datasets import load_dataset as hf_load_dataset
 
-OUTPUT_COLUMNS = [
-    "conversation_id",
-    "text",
-    "manipulation_type",
-    "is_manipulation",
-    "context_type",
-    "conversation_length",
-    "word_count_total",
-    "question_count",
-    "denial_count",
-]
+# ── Configuration ─────────────────────────────────────────────────────────────
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-RAW_DATA_FILE = PROJECT_ROOT / "data/raw/manipulational_conversation.json"
-DEDUPED_DATA_FILE = PROJECT_ROOT / "data/processed/deduped_conversations.csv"
+SUBSET   = "mentalmanip_maj"   # or "mentalmanip_con"
+TASK: Literal["binary", "technique"] = "binary"
 
+# For TASK="technique": drop techniques with fewer than this many examples
+# so the classifier has enough signal per class.
+MIN_TECHNIQUE_SUPPORT = 50
 
-def load_raw_json(file_path: str | Path) -> list[dict[str, Any]]:
+OUTPUT_COLUMNS = ["text", "manipulation_type", "manipulative", "technique", "vulnerability"]
 
-    # Load a raw dataset
-    path = Path(file_path)
-    raw_text = path.read_text(encoding="utf-8").strip()
-
-    if not raw_text:
-        return []
-
-    try:
-
-        data = json.loads(raw_text)
-
-    except json.JSONDecodeError:
-
-        records = []
-
-        for line_number, line in enumerate(raw_text.splitlines(), start=1):
-
-            line = line.strip()
-
-            if not line:
-                continue
-
-            try:
-
-                records.append(json.loads(line))
-
-            except json.JSONDecodeError as exc:
-
-                raise ValueError(f"Invalid JSON on line {line_number} of {path}") from exc
-            
-        return records
-
-    if isinstance(data, list):
-
-        return data
-
-    if isinstance(data, dict):
-
-        return [data]
-
-    raise ValueError(f"Expected a JSON array, JSON object, or JSONL records in {path}")
+PROJECT_ROOT    = Path(__file__).resolve().parent.parent
+DEDUPED_DATA_FILE = PROJECT_ROOT / "data" / "processed" / "deduped_conversations.csv"
 
 
-def flatten_messages(messages: list[dict[str, Any]] | None) -> str:
+# ── Loaders ───────────────────────────────────────────────────────────────────
 
-    # flatten message dictionaries into one speaker
+def load_raw_dataframe(subset: str = SUBSET) -> pd.DataFrame:
+    """Download (or use cached) MentalManip from HuggingFace and return raw DataFrame."""
+    hf_ds = hf_load_dataset("audreyeleven/MentalManip", subset)
+    # The dataset only ships a 'train' split — we do our own 80/20 split later.
+    df = hf_ds["train"].to_pandas()
+    return df
 
-    if not messages:
-        return "No message enter a message"
 
-    lines = []
+def _primary_technique(technique_str: str | None) -> str | None:
+    """Return the first listed technique from a comma-separated string."""
+    if not technique_str or pd.isna(technique_str):
+        return None
+    parts = [t.strip() for t in str(technique_str).split(",") if t.strip()]
+    return parts[0] if parts else None
 
-    for message in messages:
 
-        speaker = str(message.get("speaker", "Unknown")).strip() or "Unknown"
+def build_dataframe(
+    raw_df: pd.DataFrame,
+    task: Literal["binary", "technique"] = TASK,
+    min_technique_support: int = MIN_TECHNIQUE_SUPPORT,
+) -> pd.DataFrame:
+    """
+    Transform the raw HuggingFace DataFrame into the shape expected by
+    majority_baseline.py and naivebayes.py.
 
-        text = str(message.get("text", "")).strip()
+    LABEL_COLUMN used downstream: "manipulation_type"
+    TEXT_COLUMN  used downstream: "text"
+    """
+    df = raw_df.copy()
 
-        if text:
+    # Rename to match downstream expectations
+    df = df.rename(columns={"Dialogue": "text", "dialogue": "text"})  # handle either casing
+    # HuggingFace col names for mentalmanip_maj/con: id, Dialogue, Manipulative, Technique, Vulnerability
+    # Lowercase everything for safety
+    df.columns = [c.lower() for c in df.columns]
+    df = df.rename(columns={"dialogue": "text"})
 
-            lines.append(f"{speaker}: {text}")
+    # Keep raw columns for reference
+    df["manipulative"] = df["manipulative"].astype(int)
+    df["technique"]    = df["technique"].fillna("").astype(str)
+    df["vulnerability"] = df.get("vulnerability", pd.Series([""] * len(df))).fillna("").astype(str)
 
-    return "\n".join(lines)
+    if task == "binary":
+        df["manipulation_type"] = df["manipulative"].map(
+            {1: "manipulative", 0: "non_manipulative"}
+        )
 
-#building data
-def build_dataframe(records: list[dict[str, Any]]) -> pd.DataFrame:
-   
+    elif task == "technique":
+        # Only keep manipulative examples that have at least one technique label
+        df = df[df["manipulative"] == 1].copy()
+        df = df[df["technique"] != ""].copy()
 
-    rows = []
-    for record in records:
+        df["manipulation_type"] = df["technique"].apply(_primary_technique)
+        df = df.dropna(subset=["manipulation_type"])
 
-        row = {column: record.get(column) for column in OUTPUT_COLUMNS if column != "text"}
+        # Drop rare techniques so the classifier has enough signal
+        counts = df["manipulation_type"].value_counts()
+        valid_techniques = counts[counts >= min_technique_support].index
+        df = df[df["manipulation_type"].isin(valid_techniques)].copy()
 
-        row["text"] = flatten_messages(record.get("messages"))
+        if df.empty:
+            raise ValueError(
+                f"No techniques have >= {min_technique_support} examples. "
+                "Lower MIN_TECHNIQUE_SUPPORT or use TASK='binary'."
+            )
 
-        rows.append(row)
+    else:
+        raise ValueError(f"Unknown TASK: {task!r}. Choose 'binary' or 'technique'.")
 
-    return pd.DataFrame(rows, columns=OUTPUT_COLUMNS)
+    # Ensure text is a clean string
+    df["text"] = df["text"].fillna("").astype(str)
+
+    return df[OUTPUT_COLUMNS].reset_index(drop=True)
 
 
 def load_dataset() -> pd.DataFrame:
-    
-    records = load_raw_json(RAW_DATA_FILE)
-    
-    return build_dataframe(records)
+    """Main entry point used by majority_baseline.py and naivebayes.py."""
+    raw_df = load_raw_dataframe()
+    return build_dataframe(raw_df)
 
 
 def deduplicate_conversations(df: pd.DataFrame) -> pd.DataFrame:
-
     return df.drop_duplicates(subset=["text"]).reset_index(drop=True)
 
 
 def load_deduped_dataset() -> pd.DataFrame:
-
     return deduplicate_conversations(load_dataset())
 
 
 def save_deduped_dataset() -> Path:
-
     df = load_deduped_dataset()
     DEDUPED_DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(DEDUPED_DATA_FILE, index=False)
     return DEDUPED_DATA_FILE
 
 
-def find_default_raw_file() -> Path:
-
-    return RAW_DATA_FILE
-
+# ── CLI ───────────────────────────────────────────────────────────────────────
 
 def main() -> None:
-
-    input_path = find_default_raw_file()
+    print(f"Loading MentalManip subset='{SUBSET}', task='{TASK}' ...")
     df = load_dataset()
 
-    print(f"Loaded file: {input_path}")
+    print(f"Total rows after processing : {len(df)}")
+    print(f"Columns                     : {list(df.columns)}")
+    print(f"\nClass distribution (manipulation_type):")
+    print(df["manipulation_type"].value_counts().to_string())
 
-    print(f"Number of rows: {len(df)}")
+    print("\nFirst 3 examples:")
+    for _, row in df[["manipulation_type", "text"]].head(3).iterrows():
+        print("---")
+        print(f"label : {row['manipulation_type']}")
+        print(f"text  : {str(row['text'])[:300]}")
 
-    deduped_df = deduplicate_conversations(df)
-    deduped_path = save_deduped_dataset()
-
-    print(f"Unique text rows after deduplication: {len(deduped_df)}")
-    print(f"Removed exact duplicate text rows: {len(df) - len(deduped_df)}")
-    print(f"Saved deduped dataset to: {deduped_path}")
-
-    print(f"Columns: {list(df.columns)}")
-
-    print("\nFirst 3 processed examples:")
-
-    preview_columns = ["conversation_id", "manipulation_type", "text"]
-
-    with pd.option_context("display.max_colwidth", 500, "display.width", 120):
-
-        print(df[preview_columns].head(3).to_string(index=False))
+    path = save_deduped_dataset()
+    print(f"\nSaved deduped dataset to: {path}")
 
 
 if __name__ == "__main__":

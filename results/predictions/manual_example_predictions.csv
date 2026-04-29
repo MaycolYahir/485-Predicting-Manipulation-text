@@ -1,22 +1,22 @@
 example_id,expected_label,text,predicted_label,predicted_confidence,matched_expected_label
 manual_guilt_01,guilt_tripping,"A: After everything I've done for you, you can't help me with one thing?
 B: I have a deadline tonight.
-A: Wow. I guess my sacrifices meant nothing.",guilt_tripping,0.9842739581749134,True
+A: Wow. I guess my sacrifices meant nothing.",manipulative,0.5975428131411779,False
 manual_charm_01,charm_flattery,"A: You're honestly the only person smart enough to understand this.
 B: What do you need?
-A: Just sign off on it. I trust your judgment more than anyone's.",charm_flattery,0.9984282167985179,True
+A: Just sign off on it. I trust your judgment more than anyone's.",manipulative,0.7335298813852257,False
 manual_coercion_01,direct_coercion,"A: Send me the file today.
 B: I need more time to check it.
-A: No. If you don't send it now, there will be consequences.",neutral,0.6820022995403888,False
+A: No. If you don't send it now, there will be consequences.",manipulative,0.578140007823094,False
 manual_gaslighting_01,gaslighting,"A: I never promised that.
 B: You said it yesterday.
-A: You're imagining things again. This is why nobody can talk to you.",gaslighting,0.9468629227239033,True
+A: You're imagining things again. This is why nobody can talk to you.",manipulative,0.7108323907900841,False
 manual_love_bombing_01,love_bombing,"A: I know we just met, but you're my whole world already.
 B: That feels really fast.
-A: I bought you something expensive because no one will ever love you like I do.",love_bombing,0.9971297353597536,True
+A: I bought you something expensive because no one will ever love you like I do.",manipulative,0.6539563352261839,False
 manual_passive_01,passive_aggressive,"A: Sure, do whatever you want.
 B: Are you upset?
-A: No, it's fine. Some people care about plans, but it's fine.",guilt_tripping,0.6352154047811867,False
+A: No, it's fine. Some people care about plans, but it's fine.",non_manipulative,0.5288575640495402,False
 manual_neutral_01,neutral,"A: Do you want to study after class?
 B: Sure, let's meet at the library at five.
-A: Sounds good. I'll bring the notes.",neutral,0.9870058826049782,True
+A: Sounds good. I'll bring the notes.",non_manipulative,0.5821755261995007,False
