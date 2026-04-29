@@ -1,0 +1,30 @@
+metric,value
+config,mentalmanip_con
+total_rows,2915
+manipulative_rows,2016
+non_manipulative_rows,899
+stage2_rows,1748
+stage2_num_classes,135
+stage1_imbalance_ratio_majority_to_minority,2.242491657397108
+smallest_stage2_class_size,1
+largest_stage2_class_size,429
+top_technique_count::Persuasion or Seduction,429
+top_technique_count::Intimidation,193
+top_technique_count::Shaming or Belittlement,182
+top_technique_count::Accusation,134
+top_technique_count::Rationalization,86
+"top_technique_count::Shaming or Belittlement,Accusation",61
+top_technique_count::Denial,45
+top_technique_count::Evasion,43
+"top_technique_count::Rationalization,Persuasion or Seduction",39
+top_technique_count::Brandishing Anger,35
+top_technique_count::Playing Victim Role,24
+top_technique_count::Feigning Innocence,23
+"top_technique_count::Intimidation,Persuasion or Seduction",23
+"top_technique_count::Shaming or Belittlement,Intimidation",20
+"top_technique_count::Accusation,Shaming or Belittlement",20
+"top_technique_count::Shaming or Belittlement,Persuasion or Seduction",19
+"top_technique_count::Shaming or Belittlement,Brandishing Anger",16
+"top_technique_count::Persuasion or Seduction,Intimidation",14
+"top_technique_count::Accusation,Persuasion or Seduction",14
+"top_technique_count::Playing Victim Role,Accusation",13

@@ -1,0 +1,37 @@
+{
+  "config": "mentalmanip_con",
+  "total_rows": 2915,
+  "manipulative_rows": 2016,
+  "non_manipulative_rows": 899,
+  "stage2_rows": 1748,
+  "stage2_num_classes": 135,
+  "stage1_class_counts": {
+    "non_manipulative": 899,
+    "manipulative": 2016
+  },
+  "stage1_imbalance_ratio_majority_to_minority": 2.242491657397108,
+  "top_20_technique_labels": {
+    "Persuasion or Seduction": 429,
+    "Intimidation": 193,
+    "Shaming or Belittlement": 182,
+    "Accusation": 134,
+    "Rationalization": 86,
+    "Shaming or Belittlement,Accusation": 61,
+    "Denial": 45,
+    "Evasion": 43,
+    "Rationalization,Persuasion or Seduction": 39,
+    "Brandishing Anger": 35,
+    "Playing Victim Role": 24,
+    "Feigning Innocence": 23,
+    "Intimidation,Persuasion or Seduction": 23,
+    "Shaming or Belittlement,Intimidation": 20,
+    "Accusation,Shaming or Belittlement": 20,
+    "Shaming or Belittlement,Persuasion or Seduction": 19,
+    "Shaming or Belittlement,Brandishing Anger": 16,
+    "Persuasion or Seduction,Intimidation": 14,
+    "Accusation,Persuasion or Seduction": 14,
+    "Playing Victim Role,Accusation": 13
+  },
+  "smallest_stage2_class_size": 1,
+  "largest_stage2_class_size": 429
+}

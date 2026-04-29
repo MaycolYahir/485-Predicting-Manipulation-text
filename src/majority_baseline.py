@@ -4,25 +4,24 @@ import json
 from pathlib import Path
 
 import pandas as pd
-from sklearn.metrics import accuracy_score, f1_score
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+)
 
 try:
     from .load_data import load_dataset
-    from .utils import ensure_dir
+    from .utils import LABEL_COLUMN, RANDOM_STATE, TEST_SIZE, TEXT_COLUMN, ensure_dir, split_for_modeling
 except ImportError:
     from load_data import load_dataset
-    from utils import ensure_dir
-
-
-
-
-LABEL_COLUMN = "manipulation_type"
-TEXT_COLUMN = "text"
+    from utils import LABEL_COLUMN, RANDOM_STATE, TEST_SIZE, TEXT_COLUMN, ensure_dir, split_for_modeling
 
 
 def validate_dataframe(df: pd.DataFrame) -> str:
-
     if LABEL_COLUMN not in df.columns:
         raise ValueError(f"Missing required label column: {LABEL_COLUMN}")
 
@@ -32,82 +31,112 @@ def validate_dataframe(df: pd.DataFrame) -> str:
     return TEXT_COLUMN
 
 
-def run_majority_baseline(df: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
+def _is_binary_problem(y_true: pd.Series) -> bool:
+    return sorted(y_true.astype(str).unique().tolist()) == ["manipulative", "non_manipulative"]
 
+
+def _confusion_matrix_payload(y_true: pd.Series, y_pred: list[str]) -> dict:
+    labels = sorted(set(y_true.astype(str).tolist()) | set(map(str, y_pred)))
+    matrix = confusion_matrix(y_true, y_pred, labels=labels)
+    return {
+        "labels": labels,
+        "matrix": matrix.tolist(),
+    }
+
+
+def _classification_report_table(y_true: pd.Series, y_pred: list[str]) -> pd.DataFrame:
+    report = classification_report(
+        y_true,
+        y_pred,
+        output_dict=True,
+        zero_division=0,
+    )
+
+    rows = []
+    for label, scores in report.items():
+        if not isinstance(scores, dict) or label in {"accuracy", "macro avg", "weighted avg"}:
+            continue
+        rows.append(
+            {
+                "class": label,
+                "precision": float(scores["precision"]),
+                "recall": float(scores["recall"]),
+                "f1_score": float(scores["f1-score"]),
+                "support": int(scores["support"]),
+            }
+        )
+
+    return pd.DataFrame(rows)
+
+
+def run_majority_baseline(
+    df: pd.DataFrame,
+    stage_name: str = "stage1_binary",
+    rare_label_min_count: int | None = None,
+) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
     text_column = validate_dataframe(df)
 
-    clean_df = df.dropna(subset=[LABEL_COLUMN, text_column]).copy()
-
-    clean_df[LABEL_COLUMN] = clean_df[LABEL_COLUMN].astype(str)
-    clean_df[text_column] = clean_df[text_column].astype(str)
-
-    total_examples_before_deduplication = len(clean_df)
-    duplicate_text_rows = int(clean_df.duplicated(subset=[text_column]).sum())
-    clean_df = clean_df.drop_duplicates(subset=[text_column]).copy()
-
-    label_counts = clean_df[LABEL_COLUMN].value_counts()
-
-
-
-    train_df, test_df = train_test_split(
-        clean_df,
-        test_size=0.2,
-        random_state=42,
-        stratify=clean_df[LABEL_COLUMN],
+    train_df, test_df, split_metadata = split_for_modeling(
+        df,
+        label_column=LABEL_COLUMN,
+        text_column=text_column,
+        test_size=TEST_SIZE,
+        random_state=RANDOM_STATE,
+        rare_label_min_count=rare_label_min_count,
     )
 
     y_train = train_df[LABEL_COLUMN]
     y_test = test_df[LABEL_COLUMN]
 
-    train_counts = y_train.value_counts()
-
-    majority_class = str(train_counts.idxmax())
-
-    majority_class_count = int(train_counts.loc[majority_class])
-
-    majority_class_proportion = majority_class_count / len(train_df)
-
+    majority_class = str(y_train.value_counts().idxmax())
     predicted_labels = [majority_class] * len(test_df)
+    report_df = _classification_report_table(y_test, predicted_labels)
 
     metrics = {
         "model": "majority_class_baseline",
-        "data_source": "load_dataset() with exact text deduplication before split",
+        "stage": stage_name,
+        "data_source": "MentalManip with exact text deduplication before split",
         "target_column": LABEL_COLUMN,
         "text_column": text_column,
-        "random_seed": 42,
-        "test_size_fraction": 0.2,
-        "total_examples_before_deduplication": int(total_examples_before_deduplication),
-        "duplicate_text_rows_removed_before_split": int(duplicate_text_rows),
-        "total_examples": int(len(clean_df)),
-        "train_size": int(len(train_df)),
-        "test_size": int(len(test_df)),
-        "number_of_classes": int(clean_df[LABEL_COLUMN].nunique()),
+        "random_seed": RANDOM_STATE,
+        "test_size_fraction": TEST_SIZE,
+        **split_metadata,
+        "number_of_classes": int(pd.concat([y_train, y_test]).nunique()),
         "majority_class": majority_class,
-        "majority_class_training_count": majority_class_count,
-        "majority_class_training_proportion": float(majority_class_proportion),
+        "majority_class_training_count": int(y_train.value_counts().loc[majority_class]),
+        "majority_class_training_proportion": float((y_train == majority_class).mean()),
         "accuracy": float(accuracy_score(y_test, predicted_labels)),
-        "macro_f1": float(
-            f1_score(y_test, predicted_labels, average="macro", zero_division=0)
+        "macro_f1": float(f1_score(y_test, predicted_labels, average="macro", zero_division=0)),
+        "weighted_f1": float(
+            f1_score(y_test, predicted_labels, average="weighted", zero_division=0)
         ),
         "label_distribution_full_data": {
-            str(label): int(count) for label, count in label_counts.items()
+            str(label): int(count)
+            for label, count in pd.concat([y_train, y_test]).value_counts().items()
         },
+        "confusion_matrix": _confusion_matrix_payload(y_test, predicted_labels),
+        "class_metrics": report_df.set_index("class").to_dict(orient="index"),
     }
 
-    prediction_data = {
-        "true_label": y_test.to_list(),
-        "predicted_label": predicted_labels,
-    }
+    if _is_binary_problem(y_test):
+        metrics["precision"] = float(
+            precision_score(y_test, predicted_labels, pos_label="manipulative", zero_division=0)
+        )
+        metrics["recall"] = float(
+            recall_score(y_test, predicted_labels, pos_label="manipulative", zero_division=0)
+        )
+        metrics["f1"] = float(
+            f1_score(y_test, predicted_labels, pos_label="manipulative", zero_division=0)
+        )
 
-    if "conversation_id" in test_df.columns:
-        prediction_data = {
-            "conversation_id": test_df["conversation_id"].to_list(),
-            **prediction_data,
+    predictions = pd.DataFrame(
+        {
+            "true_label": y_test.to_list(),
+            "predicted_label": predicted_labels,
         }
+    )
 
-    predictions = pd.DataFrame(prediction_data)
-
-    return metrics, predictions
+    return metrics, predictions, report_df
 
 
 def save_metrics(
@@ -120,50 +149,44 @@ def save_metrics(
     return path
 
 
-def save_predictions(predictions: pd.DataFrame, output_path: str | Path = Path("results/predictions/majority_baseline_predictions.csv"),) -> Path:
+def save_predictions(
+    predictions: pd.DataFrame,
+    output_path: str | Path = Path("results/predictions/majority_baseline_predictions.csv"),
+) -> Path:
     path = Path(output_path)
     ensure_dir(path.parent)
     predictions.to_csv(path, index=False)
-
     return path
-
-
-def progress_report_paragraph(metrics: dict) -> str:
-    
-    return (
-        "For the initial processing baseline, we removed exact duplicate flattened "
-        "conversations and used an 80/20 stratified train/test split with a fixed "
-        "random seed. The majority-class baseline "
-        f"always predicted the most frequent training label, "
-        f"{metrics['majority_class']!r}. On the test set, this baseline reached "
-        f"{metrics['accuracy']:.4f} accuracy and {metrics['macro_f1']:.4f} macro F1. "
-        "These results provide the minimum benchmark for later text-only models "
-        "such as TF-IDF with Naive Bayes and Logistic Regression."
-    )
 
 
 def print_summary(metrics: dict) -> None:
     print("Majority Baseline Summary")
-    print(f"Total examples: {metrics['total_examples']}")
+    print(f"Stage: {metrics['stage']}")
+    print(f"Total examples: {metrics['total_examples_after_cleaning']}")
     print(f"Train size / test size: {metrics['train_size']} / {metrics['test_size']}")
     print(f"Number of classes: {metrics['number_of_classes']}")
     print(f"Majority class: {metrics['majority_class']}")
     print(f"Accuracy: {metrics['accuracy']:.4f}")
     print(f"Macro F1: {metrics['macro_f1']:.4f}")
+    print(f"Weighted F1: {metrics['weighted_f1']:.4f}")
+    if "precision" in metrics:
+        print(f"Precision: {metrics['precision']:.4f}")
+        print(f"Recall: {metrics['recall']:.4f}")
+        print(f"F1: {metrics['f1']:.4f}")
 
 
 def main() -> None:
-    df = load_dataset()
-    metrics, predictions = run_majority_baseline(df)
+    df = load_dataset(task="binary")
+    metrics, predictions, report_df = run_majority_baseline(df, stage_name="stage1_binary")
 
     metrics_path = save_metrics(metrics)
     predictions_path = save_predictions(predictions)
 
     print_summary(metrics)
-    print(f"Saved metrics to: {metrics_path}")
+    print("\nClass-wise metrics:")
+    print(report_df.to_string(index=False))
+    print(f"\nSaved metrics to: {metrics_path}")
     print(f"Saved predictions to: {predictions_path}")
-    print()
-    print(progress_report_paragraph(metrics))
 
 
 if __name__ == "__main__":

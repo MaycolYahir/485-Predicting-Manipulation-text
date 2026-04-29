@@ -1,0 +1,136 @@
+technique,count
+Persuasion or Seduction,429
+Intimidation,193
+Shaming or Belittlement,182
+Accusation,134
+Rationalization,86
+"Shaming or Belittlement,Accusation",61
+Denial,45
+Evasion,43
+"Rationalization,Persuasion or Seduction",39
+Brandishing Anger,35
+Playing Victim Role,24
+Feigning Innocence,23
+"Intimidation,Persuasion or Seduction",23
+"Shaming or Belittlement,Intimidation",20
+"Accusation,Shaming or Belittlement",20
+"Shaming or Belittlement,Persuasion or Seduction",19
+"Shaming or Belittlement,Brandishing Anger",16
+"Persuasion or Seduction,Intimidation",14
+"Accusation,Persuasion or Seduction",14
+"Playing Victim Role,Accusation",13
+"Brandishing Anger,Accusation",13
+"Intimidation,Accusation",12
+"Rationalization,Accusation",12
+Playing Servant Role,11
+"Intimidation,Brandishing Anger",10
+"Brandishing Anger,Persuasion or Seduction",10
+"Rationalization,Intimidation",9
+"Rationalization,Shaming or Belittlement",9
+"Brandishing Anger,Intimidation",9
+"Persuasion or Seduction,Shaming or Belittlement",9
+"Accusation,Rationalization",8
+"Denial,Accusation",8
+"Feigning Innocence,Accusation",7
+"Persuasion or Seduction,Accusation",6
+"Evasion,Accusation",6
+"Rationalization,Feigning Innocence",6
+"Persuasion or Seduction,Rationalization",6
+"Brandishing Anger,Shaming or Belittlement",6
+"Playing Servant Role,Persuasion or Seduction",5
+"Playing Victim Role,Shaming or Belittlement",5
+"Accusation,Brandishing Anger",4
+"Rationalization,Brandishing Anger",4
+"Intimidation,Shaming or Belittlement",4
+"Evasion,Persuasion or Seduction",3
+"Evasion,Rationalization",3
+"Denial,Evasion",3
+"Denial,Intimidation",3
+"Evasion,Intimidation",3
+"Shaming or Belittlement,Accusation,Persuasion or Seduction",3
+"Denial,Feigning Innocence",3
+"Shaming or Belittlement,Denial",3
+"Accusation,Denial",3
+"Accusation,Playing Victim Role",3
+"Shaming or Belittlement,Brandishing Anger,Accusation",3
+"Evasion,Brandishing Anger",2
+"Evasion,Shaming or Belittlement",2
+"Rationalization,Accusation,Shaming or Belittlement",2
+"Playing Servant Role,Playing Victim Role",2
+"Rationalization,Playing Servant Role",2
+"Denial,Evasion,Feigning Innocence",2
+"Intimidation,Brandishing Anger,Accusation",2
+"Persuasion or Seduction,Brandishing Anger",2
+"Playing Victim Role,Persuasion or Seduction",2
+"Feigning Innocence,Rationalization",2
+"Denial,Rationalization",2
+"Persuasion or Seduction,Denial",2
+"Denial,Persuasion or Seduction",2
+"Accusation,Intimidation",2
+"Brandishing Anger,Evasion",2
+"Denial,Shaming or Belittlement",2
+"Feigning Innocence,Playing Victim Role",2
+"Persuasion or Seduction,Evasion",2
+"Persuasion or Seduction,Playing Victim Role",2
+"Intimidation,Brandishing Anger,Shaming or Belittlement",2
+"Rationalization,Playing Victim Role",2
+"Persuasion or Seduction,Playing Servant Role",2
+"Rationalization,Persuasion or Seduction,Intimidation",1
+"Rationalization,Brandishing Anger,Accusation",1
+"Persuasion or Seduction,Rationalization,Playing Servant Role",1
+"Intimidation,Feigning Innocence",1
+"Accusation,Denial,Evasion",1
+"Evasion,Feigning Innocence,Rationalization",1
+"Feigning Innocence,Persuasion or Seduction",1
+"Playing Servant Role,Rationalization",1
+"Feigning Innocence,Rationalization,Accusation",1
+"Feigning Innocence,Playing Servant Role",1
+"Accusation,Evasion",1
+"Feigning Innocence,Accusation,Denial",1
+"Evasion,Denial",1
+"Playing Victim Role,Denial,Evasion",1
+"Denial,Rationalization,Evasion",1
+"Brandishing Anger,Rationalization,Intimidation",1
+"Shaming or Belittlement,Persuasion or Seduction,Accusation",1
+"Rationalization,Shaming or Belittlement,Accusation",1
+"Intimidation,Accusation,Rationalization",1
+"Playing Servant Role,Intimidation,Rationalization",1
+"Playing Victim Role,Intimidation,Persuasion or Seduction",1
+"Playing Victim Role,Accusation,Brandishing Anger",1
+"Playing Victim Role,Feigning Innocence",1
+"Intimidation,Playing Servant Role,Persuasion or Seduction",1
+"Evasion,Playing Victim Role,Accusation",1
+"Shaming or Belittlement,Brandishing Anger,Intimidation",1
+"Shaming or Belittlement,Accusation,Rationalization,Intimidation",1
+"Accusation,Rationalization,Persuasion or Seduction",1
+"Brandishing Anger,Evasion,Shaming or Belittlement",1
+"Intimidation,Rationalization",1
+"Playing Servant Role,Intimidation,Accusation",1
+"Persuasion or Seduction,Feigning Innocence",1
+"Shaming or Belittlement,Rationalization,Accusation",1
+"Feigning Innocence,Brandishing Anger",1
+"Feigning Innocence,Intimidation,Accusation",1
+"Denial,Playing Victim Role,Accusation",1
+"Rationalization,Accusation,Persuasion or Seduction",1
+"Rationalization,Playing Victim Role,Persuasion or Seduction",1
+"Playing Victim Role,Brandishing Anger,Accusation",1
+"Playing Servant Role,Accusation,Shaming or Belittlement",1
+"Denial,Brandishing Anger",1
+"Intimidation,Accusation,Brandishing Anger",1
+"Shaming or Belittlement,Accusation,Brandishing Anger",1
+"Evasion,Playing Victim Role",1
+"Rationalization,Playing Victim Role,Evasion,Feigning Innocence",1
+"Rationalization,Denial",1
+"Brandishing Anger,Playing Victim Role",1
+"Feigning Innocence,Evasion",1
+"Shaming or Belittlement,Rationalization,Brandishing Anger",1
+"Brandishing Anger,Persuasion or Seduction,Shaming or Belittlement",1
+"Accusation,Feigning Innocence",1
+"Shaming or Belittlement,Intimidation,Persuasion or Seduction",1
+"Playing Servant Role,Shaming or Belittlement",1
+"Shaming or Belittlement,Evasion",1
+"Playing Victim Role,Shaming or Belittlement,Accusation",1
+"Shaming or Belittlement,Accusation,Playing Victim Role",1
+"Intimidation,Denial",1
+"Shaming or Belittlement,Playing Victim Role",1
+"Persuasion or Seduction,Rationalization,Accusation",1

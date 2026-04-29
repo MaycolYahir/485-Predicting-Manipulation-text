@@ -1,6 +1,7 @@
-# Detecting Psychological Manipulation Types in Synthetic Conversations
+# Detecting Psychological Manipulation in MentalManip Dialogues
 
-COMPSCI 485 NLP final project for multiclass classification of `manipulation_type` from synthetic conversation text.
+COMPSCI 485 NLP final project using the Hugging Face `audreyeleven/MentalManip`
+dataset with a two-stage text classification pipeline.
 
 
 ## Setup
@@ -13,27 +14,64 @@ python -m pip install -r requirements.txt
 
 ## Data
 
-Download the Kaggle dataset and place the raw file in `data/raw/`.
+The project now loads data directly from Hugging Face with:
 
-The loader supports either:
+```python
+from datasets import load_dataset
+ds = load_dataset("audreyeleven/MentalManip", "mentalmanip_maj")
+```
 
-- JSONL: one JSON object per line
-- JSON array: one list of JSON objects
+The active config is `mentalmanip_maj`, which is the majority-vote version.
 
 ## Run The Loader
 
-The loader uses the hardcoded raw dataset path `data/raw/manipulational_conversation.json`:
-
 ```bash
-python src/load_data.py
+python3 -m src.load_data
 ```
 
-If your shell does not define `python`, use `python3` for these commands.
+The loader prints dataset stats including:
 
-The script prints the number of rows, the processed columns, and the first three flattened examples.
+- total rows
+- manipulative vs non-manipulative counts
+- stage-2 row count
+- class imbalance
+- top 20 exact technique labels
 
 ## Modeling Plan
 
-The main experiment should use text-only classification from flattened messages. Metadata-only and text-plus-metadata models can be useful comparisons, but some metadata fields may leak the label and make the task artificially easy.
+The project keeps the original text-only baselines and reuses the existing
+train/test split structure:
 
-Because the dataset is synthetic, results should be discussed as performance on generated conversations rather than guaranteed real-world manipulation detection.
+- Stage 1: binary classification
+  `Dialogue` -> `Manipulative`
+- Stage 2: exact technique-string classification on manipulative rows only
+  `Dialogue` -> full `Technique` string
+
+Current implemented baselines:
+
+- majority-class baseline
+- TF-IDF + Multinomial Naive Bayes
+
+## Run The Notebooks
+
+```bash
+./.venv/bin/jupyter lab
+```
+
+Main notebooks:
+
+- `notebooks/01_eda.ipynb`
+  MentalManip dataset stats, previews, and top-technique plots
+- `notebooks/02_text_only_models.ipynb`
+  Stage 1 binary results and stage 2 exact-technique results
+
+The notebooks:
+
+- load `mentalmanip_maj`
+- run stage 1 and stage 2 in notebook cells
+- save notebook-local metrics and predictions under `notebooks/results/`
+- save notebook-local figures under `notebooks/figures/`
+
+Because the dataset is synthetic/annotated dialogue data, results should be
+discussed as performance on this benchmark rather than as guaranteed real-world
+manipulation detection.

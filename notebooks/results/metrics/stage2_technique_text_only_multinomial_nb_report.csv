@@ -1,0 +1,58 @@
+class,precision,recall,f1_score,support
+Persuasion or Seduction,0.27680798004987534,0.9652173913043478,0.43023255813953487,115
+Shaming or Belittlement,0.1111111111111111,0.02127659574468085,0.03571428571428571,47
+Intimidation,0.16666666666666666,0.043478260869565216,0.06896551724137931,46
+Accusation,0.14285714285714285,0.027777777777777776,0.046511627906976744,36
+Rationalization,0.0,0.0,0.0,22
+"Shaming or Belittlement,Accusation",0.0,0.0,0.0,14
+Evasion,0.0,0.0,0.0,12
+OTHER,0.0,0.0,0.0,12
+Brandishing Anger,0.0,0.0,0.0,11
+Denial,0.0,0.0,0.0,11
+"Rationalization,Persuasion or Seduction",0.0,0.0,0.0,9
+Feigning Innocence,0.0,0.0,0.0,7
+Playing Victim Role,0.0,0.0,0.0,7
+"Intimidation,Persuasion or Seduction",0.0,0.0,0.0,6
+"Accusation,Shaming or Belittlement",0.0,0.0,0.0,4
+"Shaming or Belittlement,Brandishing Anger",0.0,0.0,0.0,4
+"Shaming or Belittlement,Intimidation",0.0,0.0,0.0,4
+"Shaming or Belittlement,Persuasion or Seduction",0.0,0.0,0.0,4
+"Accusation,Persuasion or Seduction",0.0,0.0,0.0,3
+"Brandishing Anger,Accusation",0.0,0.0,0.0,3
+"Intimidation,Accusation",0.0,0.0,0.0,3
+"Persuasion or Seduction,Intimidation",0.0,0.0,0.0,3
+"Playing Victim Role,Accusation",0.0,0.0,0.0,3
+"Rationalization,Accusation",0.0,0.0,0.0,3
+"Accusation,Rationalization",0.0,0.0,0.0,2
+"Brandishing Anger,Intimidation",0.0,0.0,0.0,2
+"Brandishing Anger,Persuasion or Seduction",0.0,0.0,0.0,2
+"Denial,Accusation",0.0,0.0,0.0,2
+"Intimidation,Brandishing Anger",0.0,0.0,0.0,2
+"Persuasion or Seduction,Shaming or Belittlement",0.0,0.0,0.0,2
+Playing Servant Role,0.0,0.0,0.0,2
+"Rationalization,Intimidation",0.0,0.0,0.0,2
+"Rationalization,Shaming or Belittlement",0.0,0.0,0.0,2
+"Accusation,Brandishing Anger",0.0,0.0,0.0,1
+"Accusation,Denial",0.0,0.0,0.0,1
+"Accusation,Playing Victim Role",0.0,0.0,0.0,1
+"Brandishing Anger,Shaming or Belittlement",0.0,0.0,0.0,1
+"Denial,Evasion",0.0,0.0,0.0,1
+"Denial,Feigning Innocence",0.0,0.0,0.0,1
+"Denial,Intimidation",0.0,0.0,0.0,1
+"Denial,Rationalization",0.0,0.0,0.0,1
+"Evasion,Accusation",0.0,0.0,0.0,1
+"Evasion,Intimidation",0.0,0.0,0.0,1
+"Evasion,Persuasion or Seduction",0.0,0.0,0.0,1
+"Evasion,Rationalization",0.0,0.0,0.0,1
+"Feigning Innocence,Accusation",0.0,0.0,0.0,1
+"Feigning Innocence,Rationalization",0.0,0.0,0.0,1
+"Intimidation,Shaming or Belittlement",0.0,0.0,0.0,1
+"Persuasion or Seduction,Accusation",0.0,0.0,0.0,1
+"Persuasion or Seduction,Rationalization",0.0,0.0,0.0,1
+"Playing Servant Role,Persuasion or Seduction",0.0,0.0,0.0,1
+"Playing Victim Role,Shaming or Belittlement",0.0,0.0,0.0,1
+"Rationalization,Brandishing Anger",0.0,0.0,0.0,1
+"Rationalization,Feigning Innocence",0.0,0.0,0.0,1
+"Shaming or Belittlement,Accusation,Persuasion or Seduction",0.0,0.0,0.0,1
+"Shaming or Belittlement,Brandishing Anger,Accusation",0.0,0.0,0.0,1
+"Shaming or Belittlement,Denial",0.0,0.0,0.0,1

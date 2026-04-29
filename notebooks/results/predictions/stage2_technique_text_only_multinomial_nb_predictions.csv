@@ -1,0 +1,432 @@
+true_label,predicted_label
+"Shaming or Belittlement,Accusation",Accusation
+"Intimidation,Accusation",Persuasion or Seduction
+"Rationalization,Persuasion or Seduction",Persuasion or Seduction
+Intimidation,Shaming or Belittlement
+Persuasion or Seduction,Persuasion or Seduction
+OTHER,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Evasion,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Shaming or Belittlement,Brandishing Anger",Persuasion or Seduction
+Brandishing Anger,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Accusation,Playing Victim Role",Persuasion or Seduction
+"Persuasion or Seduction,Intimidation",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Denial,Persuasion or Seduction
+"Accusation,Shaming or Belittlement",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Intimidation,Persuasion or Seduction",Intimidation
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+"Intimidation,Shaming or Belittlement",Shaming or Belittlement
+Persuasion or Seduction,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+"Brandishing Anger,Accusation",Persuasion or Seduction
+"Denial,Accusation",Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+"Shaming or Belittlement,Brandishing Anger",Shaming or Belittlement
+"Evasion,Rationalization",Persuasion or Seduction
+Denial,Shaming or Belittlement
+Intimidation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Denial,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Playing Victim Role,Persuasion or Seduction
+"Accusation,Brandishing Anger",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Intimidation,"Shaming or Belittlement,Accusation"
+"Playing Victim Role,Accusation",Persuasion or Seduction
+"Persuasion or Seduction,Intimidation",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+"Shaming or Belittlement,Brandishing Anger,Accusation",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Shaming or Belittlement,Intimidation",Intimidation
+Accusation,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Intimidation,Persuasion or Seduction",Persuasion or Seduction
+"Shaming or Belittlement,Brandishing Anger",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+OTHER,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Playing Victim Role,Shaming or Belittlement",Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+"Accusation,Rationalization",Intimidation
+"Denial,Intimidation",Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+OTHER,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Rationalization,Feigning Innocence",Persuasion or Seduction
+"Evasion,Accusation",Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+"Brandishing Anger,Intimidation",Persuasion or Seduction
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+"Rationalization,Shaming or Belittlement",Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+"Rationalization,Intimidation",Persuasion or Seduction
+"Rationalization,Persuasion or Seduction",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Denial,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+"Shaming or Belittlement,Persuasion or Seduction",Persuasion or Seduction
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+"Brandishing Anger,Persuasion or Seduction",Persuasion or Seduction
+Playing Servant Role,Persuasion or Seduction
+"Rationalization,Shaming or Belittlement",Persuasion or Seduction
+Playing Victim Role,Persuasion or Seduction
+"Persuasion or Seduction,Intimidation",Persuasion or Seduction
+Brandishing Anger,Persuasion or Seduction
+Rationalization,Accusation
+"Brandishing Anger,Intimidation",Persuasion or Seduction
+"Brandishing Anger,Persuasion or Seduction",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+"Playing Victim Role,Accusation",Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+OTHER,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Playing Victim Role,Intimidation
+Intimidation,Persuasion or Seduction
+Rationalization,Accusation
+Intimidation,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+"Rationalization,Accusation",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Accusation,Denial",Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Persuasion or Seduction,Shaming or Belittlement",Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Evasion,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+"Rationalization,Persuasion or Seduction",Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Evasion,Persuasion or Seduction
+Denial,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+OTHER,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Brandishing Anger,Shaming or Belittlement",Intimidation
+"Shaming or Belittlement,Brandishing Anger",Shaming or Belittlement
+Playing Victim Role,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Intimidation,Persuasion or Seduction",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Accusation,Accusation
+Accusation,Persuasion or Seduction
+Intimidation,Intimidation
+Rationalization,Accusation
+"Intimidation,Persuasion or Seduction",Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+"Rationalization,Intimidation",Persuasion or Seduction
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+Shaming or Belittlement,Shaming or Belittlement
+Shaming or Belittlement,Persuasion or Seduction
+Feigning Innocence,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Rationalization,Persuasion or Seduction",Accusation
+Intimidation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+"Rationalization,Persuasion or Seduction",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+"Playing Servant Role,Persuasion or Seduction",Persuasion or Seduction
+Feigning Innocence,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+"Shaming or Belittlement,Persuasion or Seduction",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Accusation,Persuasion or Seduction",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Denial,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Denial,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+OTHER,Persuasion or Seduction
+Brandishing Anger,"Intimidation,Persuasion or Seduction"
+Rationalization,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+"Shaming or Belittlement,Intimidation",Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Intimidation,Intimidation
+Persuasion or Seduction,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+"Shaming or Belittlement,Intimidation",Persuasion or Seduction
+Feigning Innocence,Persuasion or Seduction
+"Accusation,Persuasion or Seduction",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Evasion,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+"Feigning Innocence,Rationalization",Persuasion or Seduction
+Rationalization,Shaming or Belittlement
+Brandishing Anger,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+"Denial,Feigning Innocence",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+"Evasion,Persuasion or Seduction",Persuasion or Seduction
+"Intimidation,Persuasion or Seduction",Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+"Intimidation,Brandishing Anger",Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Shaming or Belittlement,Denial",Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+OTHER,Persuasion or Seduction
+Playing Victim Role,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+"Persuasion or Seduction,Accusation",Persuasion or Seduction
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+Evasion,Persuasion or Seduction
+Brandishing Anger,Persuasion or Seduction
+"Rationalization,Brandishing Anger",Persuasion or Seduction
+OTHER,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+OTHER,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Rationalization,Accusation",Persuasion or Seduction
+Feigning Innocence,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Denial,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+"Accusation,Rationalization",Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+"Rationalization,Persuasion or Seduction",Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Evasion,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+"Denial,Evasion",Persuasion or Seduction
+"Accusation,Persuasion or Seduction",Persuasion or Seduction
+Evasion,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+"Rationalization,Persuasion or Seduction",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Persuasion or Seduction,Rationalization",Persuasion or Seduction
+Feigning Innocence,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Intimidation,Shaming or Belittlement
+"Shaming or Belittlement,Accusation",Shaming or Belittlement
+Persuasion or Seduction,Intimidation
+"Rationalization,Persuasion or Seduction",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Playing Victim Role,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Evasion,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+Persuasion or Seduction,Intimidation
+"Accusation,Shaming or Belittlement",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+OTHER,Persuasion or Seduction
+Denial,Accusation
+"Intimidation,Accusation",Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Brandishing Anger,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+"Feigning Innocence,Accusation",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Evasion,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Playing Servant Role,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Denial,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Evasion,Persuasion or Seduction
+"Brandishing Anger,Accusation",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Accusation,Shaming or Belittlement",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+"Brandishing Anger,Accusation",Persuasion or Seduction
+Persuasion or Seduction,Intimidation
+Accusation,Persuasion or Seduction
+"Shaming or Belittlement,Intimidation",Persuasion or Seduction
+"Intimidation,Persuasion or Seduction",Persuasion or Seduction
+Brandishing Anger,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Playing Victim Role,Persuasion or Seduction
+"Denial,Rationalization",Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+OTHER,Persuasion or Seduction
+"Intimidation,Brandishing Anger",Persuasion or Seduction
+"Accusation,Shaming or Belittlement",Persuasion or Seduction
+Brandishing Anger,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Feigning Innocence,Persuasion or Seduction
+Brandishing Anger,Persuasion or Seduction
+OTHER,Persuasion or Seduction
+Brandishing Anger,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+"Rationalization,Persuasion or Seduction",Persuasion or Seduction
+Denial,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Rationalization,Accusation",Persuasion or Seduction
+"Persuasion or Seduction,Shaming or Belittlement",Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Shaming or Belittlement,Accusation,Persuasion or Seduction",Persuasion or Seduction
+"Shaming or Belittlement,Persuasion or Seduction",Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Rationalization,Persuasion or Seduction
+Evasion,Persuasion or Seduction
+"Playing Victim Role,Accusation",Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Shaming or Belittlement,Persuasion or Seduction
+"Shaming or Belittlement,Persuasion or Seduction",Persuasion or Seduction
+Evasion,Persuasion or Seduction
+Accusation,Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+"Denial,Accusation",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+Persuasion or Seduction,Persuasion or Seduction
+"Evasion,Intimidation",Persuasion or Seduction
+"Intimidation,Accusation",Persuasion or Seduction
+"Shaming or Belittlement,Accusation",Persuasion or Seduction
+Persuasion or Seduction,Intimidation
+Feigning Innocence,Persuasion or Seduction
+Intimidation,Persuasion or Seduction
+Brandishing Anger,Intimidation

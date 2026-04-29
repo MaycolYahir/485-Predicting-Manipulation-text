@@ -13,97 +13,32 @@ os.environ.setdefault("MPLCONFIGDIR", str(MPLCONFIG_DIR))
 os.environ.setdefault("XDG_CACHE_HOME", str(XDG_CACHE_DIR))
 
 import matplotlib
+
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import accuracy_score, classification_report, f1_score
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+)
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
 try:
-    from .load_data import DEDUPED_DATA_FILE, load_dataset, save_deduped_dataset
-    from .utils import ensure_dir
+    from .load_data import load_dataset
+    from .utils import LABEL_COLUMN, RANDOM_STATE, TEST_SIZE, TEXT_COLUMN, ensure_dir, split_for_modeling
 except ImportError:
-    from load_data import DEDUPED_DATA_FILE, load_dataset, save_deduped_dataset
-    from utils import ensure_dir
-
-
-LABEL_COLUMN = "manipulation_type"
-TEXT_COLUMN = "text"
-RANDOM_STATE = 42
-TEST_SIZE = 0.2
-MANUAL_EXAMPLES = [
-    {
-        "example_id": "manual_guilt_01",
-        "expected_label": "guilt_tripping",
-        "text": (
-            "A: After everything I've done for you, you can't help me with one thing?\n"
-            "B: I have a deadline tonight.\n"
-            "A: Wow. I guess my sacrifices meant nothing."
-        ),
-    },
-    {
-        "example_id": "manual_charm_01",
-        "expected_label": "charm_flattery",
-        "text": (
-            "A: You're honestly the only person smart enough to understand this.\n"
-            "B: What do you need?\n"
-            "A: Just sign off on it. I trust your judgment more than anyone's."
-        ),
-    },
-    {
-        "example_id": "manual_coercion_01",
-        "expected_label": "direct_coercion",
-        "text": (
-            "A: Send me the file today.\n"
-            "B: I need more time to check it.\n"
-            "A: No. If you don't send it now, there will be consequences."
-        ),
-    },
-    {
-        "example_id": "manual_gaslighting_01",
-        "expected_label": "gaslighting",
-        "text": (
-            "A: I never promised that.\n"
-            "B: You said it yesterday.\n"
-            "A: You're imagining things again. This is why nobody can talk to you."
-        ),
-    },
-    {
-        "example_id": "manual_love_bombing_01",
-        "expected_label": "love_bombing",
-        "text": (
-            "A: I know we just met, but you're my whole world already.\n"
-            "B: That feels really fast.\n"
-            "A: I bought you something expensive because no one will ever love you like I do."
-        ),
-    },
-    {
-        "example_id": "manual_passive_01",
-        "expected_label": "passive_aggressive",
-        "text": (
-            "A: Sure, do whatever you want.\n"
-            "B: Are you upset?\n"
-            "A: No, it's fine. Some people care about plans, but it's fine."
-        ),
-    },
-    {
-        "example_id": "manual_neutral_01",
-        "expected_label": "neutral",
-        "text": (
-            "A: Do you want to study after class?\n"
-            "B: Sure, let's meet at the library at five.\n"
-            "A: Sounds good. I'll bring the notes."
-        ),
-    },
-]
+    from load_data import load_dataset
+    from utils import LABEL_COLUMN, RANDOM_STATE, TEST_SIZE, TEXT_COLUMN, ensure_dir, split_for_modeling
 
 
 def validate_dataframe(df: pd.DataFrame) -> str:
-
     if LABEL_COLUMN not in df.columns:
         raise ValueError(f"Missing required label column: {LABEL_COLUMN}")
 
@@ -114,9 +49,7 @@ def validate_dataframe(df: pd.DataFrame) -> str:
 
 
 def build_model() -> Pipeline:
-
     return Pipeline(
-
         steps=[
             (
                 "tfidf",
@@ -125,12 +58,58 @@ def build_model() -> Pipeline:
                     min_df=2,
                     max_df=0.95,
                     max_features=5000,
-                    stop_words="english"
+                    stop_words="english",
                 ),
             ),
-            ("classifier", MultinomialNB(class_prior=[0.5, 0.5])),
+            # fit_prior=False gives uniform class priors. For stage 1 this is
+            # equivalent to [0.5, 0.5], and it still works for multi-class stage 2.
+            ("classifier", MultinomialNB(fit_prior=False)),
         ]
     )
+
+
+def _is_binary_problem(y_true: pd.Series) -> bool:
+    return sorted(y_true.astype(str).unique().tolist()) == ["manipulative", "non_manipulative"]
+
+
+def _confusion_matrix_payload(y_true: pd.Series, y_pred: list[str]) -> dict:
+    labels = sorted(set(y_true.astype(str).tolist()) | set(map(str, y_pred)))
+    matrix = confusion_matrix(y_true, y_pred, labels=labels)
+    return {
+        "labels": labels,
+        "matrix": matrix.tolist(),
+        "manageable_for_display": len(labels) <= 20,
+    }
+
+
+def classification_report_table(y_true: pd.Series, y_pred: list[str]) -> pd.DataFrame:
+    report = classification_report(
+        y_true,
+        y_pred,
+        output_dict=True,
+        zero_division=0,
+    )
+
+    rows = []
+    for label, scores in report.items():
+        if not isinstance(scores, dict) or label in {"accuracy", "macro avg", "weighted avg"}:
+            continue
+        rows.append(
+            {
+                "class": label,
+                "precision": float(scores["precision"]),
+                "recall": float(scores["recall"]),
+                "f1_score": float(scores["f1-score"]),
+                "support": int(scores["support"]),
+            }
+        )
+
+    report_df = pd.DataFrame(rows)
+    if not report_df.empty:
+        report_df = report_df.sort_values(["support", "class"], ascending=[False, True]).reset_index(
+            drop=True
+        )
+    return report_df
 
 
 def print_dataset_debug(df: pd.DataFrame, text_column: str) -> None:
@@ -141,97 +120,6 @@ def print_dataset_debug(df: pd.DataFrame, text_column: str) -> None:
         print("---")
         print(f"label: {row[LABEL_COLUMN]}")
         print(str(row[text_column])[:700])
-
-    lower_text = df[text_column].fillna("").astype(str).str.lower()
-    label_hits = []
-    for label in sorted(df[LABEL_COLUMN].dropna().astype(str).unique()):
-        variants = {label.lower(), label.lower().replace("_", " ")}
-        count = int(lower_text.apply(lambda text: any(v in text for v in variants)).sum())
-        if count:
-            label_hits.append((label, count))
-
-    if label_hits:
-        raise ValueError(f"Label text appears inside {text_column}: {label_hits}")
-
-    if "conversation_id" in df.columns:
-        id_hits = int(
-            df.apply(
-                lambda row: str(row["conversation_id"]).lower() in str(row[text_column]).lower(),
-                axis=1,
-            ).sum()
-        )
-        if id_hits:
-            raise ValueError(f"conversation_id appears inside {text_column} for {id_hits} rows")
-
-    print("No literal label names or conversation IDs found in the text column.")
-
-
-def message_overlap_diagnostic(train_df: pd.DataFrame, test_df: pd.DataFrame, text_column: str) -> dict:
-    train_lines = {
-        line.strip()
-        for text in train_df[text_column]
-        for line in str(text).splitlines()
-        if line.strip()
-    }
-    test_lines = {
-        line.strip()
-        for text in test_df[text_column]
-        for line in str(text).splitlines()
-        if line.strip()
-    }
-    shared_lines = sorted(train_lines & test_lines)
-    test_rows_with_shared_lines = int(
-        test_df[text_column].apply(
-            lambda text: any(line.strip() in train_lines for line in str(text).splitlines())
-        ).sum()
-    )
-
-    return {
-        "unique_train_message_lines": int(len(train_lines)),
-        "unique_test_message_lines": int(len(test_lines)),
-        "shared_message_lines_across_train_test": int(len(shared_lines)),
-        "test_rows_with_at_least_one_shared_message_line": test_rows_with_shared_lines,
-        "test_fraction_with_shared_message_line": float(test_rows_with_shared_lines / len(test_df)),
-        "sample_shared_message_lines": shared_lines[:25],
-    }
-
-
-def print_split_debug(
-    train_df: pd.DataFrame,
-    test_df: pd.DataFrame,
-    text_column: str,
-    y_train: pd.Series,
-    y_test: pd.Series,
-) -> dict:
-    print(f"Train size: {len(train_df)}")
-    print(f"Test size: {len(test_df)}")
-
-    overlap = train_df.index.intersection(test_df.index)
-    print(f"Train/test index overlap: {len(overlap)}")
-    assert len(overlap) == 0, "Train and test indices overlap."
-
-    train_texts = set(train_df[text_column])
-    test_texts = set(test_df[text_column])
-    overlapping_texts = train_texts & test_texts
-    duplicate_test_rows = int(test_df[text_column].isin(train_texts).sum())
-    print(f"Exact duplicate texts across train/test: {len(overlapping_texts)}")
-    print(f"Test rows whose text appears in train: {duplicate_test_rows}")
-    assert len(overlapping_texts) == 0, "Exact duplicate text appears in both train and test."
-
-    overlap_diagnostic = message_overlap_diagnostic(train_df, test_df, text_column)
-    print(
-        "Shared individual message lines across train/test: "
-        f"{overlap_diagnostic['shared_message_lines_across_train_test']}"
-    )
-    print(
-        "Test rows with at least one shared message line: "
-        f"{overlap_diagnostic['test_rows_with_at_least_one_shared_message_line']}"
-    )
-
-    majority_class = y_train.value_counts().idxmax()
-    majority_accuracy = float((y_test == majority_class).mean())
-    print(f"Majority class baseline on this split: {majority_accuracy:.4f} ({majority_class})")
-    return overlap_diagnostic
 
 
 def print_top_model_features(model: Pipeline, top_n: int = 8) -> None:
@@ -246,153 +134,120 @@ def print_top_model_features(model: Pipeline, top_n: int = 8) -> None:
         print(f"{class_label}: {top_terms}")
 
 
-def train_test_data(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, str, int, int]:
+def save_confusion_matrix_plot(
+    confusion_payload: dict,
+    output_path: str | Path,
+    title: str,
+) -> Path:
+    labels = confusion_payload["labels"]
+    matrix = confusion_payload["matrix"]
 
-    text_column = validate_dataframe(df)
+    fig_width = min(max(8, len(labels) * 0.6), 20)
+    fig_height = min(max(6, len(labels) * 0.45), 18)
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+    image = ax.imshow(matrix, cmap="Blues")
+    ax.set_title(title)
+    ax.set_xlabel("Predicted label")
+    ax.set_ylabel("True label")
+    ax.set_xticks(range(len(labels)))
+    ax.set_xticklabels(labels, rotation=45, ha="right")
+    ax.set_yticks(range(len(labels)))
+    ax.set_yticklabels(labels)
 
-    clean_df = df.dropna(subset=[LABEL_COLUMN, text_column]).copy()
+    for row_index, row in enumerate(matrix):
+        for col_index, value in enumerate(row):
+            ax.text(col_index, row_index, str(value), ha="center", va="center", fontsize=8)
 
-    clean_df[LABEL_COLUMN] = clean_df[LABEL_COLUMN].astype(str)
+    fig.colorbar(image, ax=ax, fraction=0.046, pad=0.04)
+    fig.tight_layout()
 
-    clean_df[text_column] = clean_df[text_column].astype(str)
-
-    original_count = len(clean_df)
-    duplicate_text_rows = int(clean_df.duplicated(subset=[text_column]).sum())
-
-    if duplicate_text_rows:
-        print(f"Dropping {duplicate_text_rows} exact duplicate text rows before train/test split.")
-        clean_df = clean_df.drop_duplicates(subset=[text_column]).copy()
-
-    train_df, test_df = train_test_split(
-        clean_df,
-        test_size=TEST_SIZE,
-        random_state=RANDOM_STATE,
-        stratify=clean_df[LABEL_COLUMN],
-    )
-
-    return train_df, test_df, text_column, original_count, duplicate_text_rows
-
-
-def classification_report_table(y_true: pd.Series, y_pred: list[str]) -> pd.DataFrame:
-
-    report = classification_report(
-        y_true,
-        y_pred,
-        output_dict=True,
-        zero_division=0,
-    )
-
-    rows = []
-    for label, scores in report.items():
-        if not isinstance(scores, dict) or label in {"accuracy", "macro avg", "weighted avg"}:
-            continue
-
-        rows.append(
-            {
-                "class": label,
-                "precision": float(scores["precision"]),
-                "recall": float(scores["recall"]),
-                "f1_score": float(scores["f1-score"]),
-                "support": int(scores["support"]),
-            }
-        )
-
-    return pd.DataFrame(rows)
+    path = Path(output_path)
+    ensure_dir(path.parent)
+    fig.savefig(path, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    return path
 
 
 def run_multinomial_nb(
     df: pd.DataFrame,
+    stage_name: str = "stage1_binary",
     debug: bool = True,
+    rare_label_min_count: int | None = None,
     return_model: bool = False,
 ) -> tuple[dict, pd.DataFrame, pd.DataFrame] | tuple[dict, pd.DataFrame, pd.DataFrame, Pipeline]:
-
     text_column = validate_dataframe(df)
     if debug:
         print_dataset_debug(df, text_column)
 
-    train_df, test_df, text_column, original_count, duplicate_text_rows = train_test_data(df)
+    train_df, test_df, split_metadata = split_for_modeling(
+        df,
+        label_column=LABEL_COLUMN,
+        text_column=text_column,
+        test_size=TEST_SIZE,
+        random_state=RANDOM_STATE,
+        rare_label_min_count=rare_label_min_count,
+    )
 
     model = build_model()
-
     x_train = train_df[text_column]
     y_train = train_df[LABEL_COLUMN]
     x_test = test_df[text_column]
     y_test = test_df[LABEL_COLUMN]
 
-    assert isinstance(x_train, pd.Series), "Training features must be the text Series only."
-    assert isinstance(x_test, pd.Series), "Test features must be the text Series only."
-    assert x_train.name == text_column and x_test.name == text_column
-
-    if debug:
-        overlap_diagnostic = print_split_debug(train_df, test_df, text_column, y_train, y_test)
-        print("Fitting TF-IDF + MultinomialNB only on x_train/y_train.")
-    else:
-        overlap_diagnostic = message_overlap_diagnostic(train_df, test_df, text_column)
-
     model.fit(x_train, y_train)
 
     if debug:
         print_top_model_features(model)
-        print("Predicting only on x_test.")
 
     predicted_labels = model.predict(x_test)
-    assert len(predicted_labels) == len(y_test), "Prediction length does not match y_test."
-
-    report_df = classification_report_table(y_test, predicted_labels)
-
-    majority_class = y_train.value_counts().idxmax()
-    majority_accuracy = float((y_test == majority_class).mean())
+    report_df = classification_report_table(y_test, predicted_labels.tolist())
+    confusion_payload = _confusion_matrix_payload(y_test, predicted_labels.tolist())
 
     metrics = {
-
         "model": "text_only_multinomial_nb",
-        "data_source": "load_dataset() with exact text deduplication before split",
+        "stage": stage_name,
+        "data_source": "MentalManip with exact text deduplication before split",
         "target_column": LABEL_COLUMN,
         "text_column": text_column,
         "random_seed": RANDOM_STATE,
         "test_size_fraction": TEST_SIZE,
-
-        "total_examples_before_deduplication": int(original_count),
-        "duplicate_text_rows_removed_before_split": int(duplicate_text_rows),
-        "total_examples": int(len(train_df) + len(test_df)),
-        "train_size": int(len(train_df)),
-        "test_size": int(len(test_df)),
-
+        **split_metadata,
         "number_of_classes": int(pd.concat([y_train, y_test]).nunique()),
-        "majority_class_baseline_accuracy_on_same_split": majority_accuracy,
-        "processed_deduped_data_path": str(DEDUPED_DATA_FILE.relative_to(PROJECT_ROOT)),
-        "message_overlap_diagnostic": overlap_diagnostic,
-
         "features": {
-
             "type": "tfidf",
             "ngram_range": [1, 2],
             "min_df": 2,
             "max_df": 0.95,
             "max_features": 5000,
-
+            "stop_words": "english",
         },
-
         "classifier": "MultinomialNB",
         "accuracy": float(accuracy_score(y_test, predicted_labels)),
-        "macro_f1": float(
-            f1_score(y_test, predicted_labels, average="macro", zero_division=0)
+        "macro_f1": float(f1_score(y_test, predicted_labels, average="macro", zero_division=0)),
+        "weighted_f1": float(
+            f1_score(y_test, predicted_labels, average="weighted", zero_division=0)
         ),
         "class_metrics": report_df.set_index("class").to_dict(orient="index"),
+        "confusion_matrix": confusion_payload,
     }
 
-    prediction_data = {
-        "true_label": y_test.to_list(),
-        "predicted_label": predicted_labels.tolist(),
-    }
+    if _is_binary_problem(y_test):
+        metrics["precision"] = float(
+            precision_score(y_test, predicted_labels, pos_label="manipulative", zero_division=0)
+        )
+        metrics["recall"] = float(
+            recall_score(y_test, predicted_labels, pos_label="manipulative", zero_division=0)
+        )
+        metrics["f1"] = float(
+            f1_score(y_test, predicted_labels, pos_label="manipulative", zero_division=0)
+        )
 
-    if "conversation_id" in test_df.columns:
-        prediction_data = {
-            "conversation_id": test_df["conversation_id"].to_list(),
-            **prediction_data,
+    predictions = pd.DataFrame(
+        {
+            "true_label": y_test.to_list(),
+            "predicted_label": predicted_labels.tolist(),
         }
-
-    predictions = pd.DataFrame(prediction_data)
+    )
 
     if return_model:
         return metrics, predictions, report_df, model
@@ -412,9 +267,7 @@ def save_metrics(
 
 def save_predictions(
     predictions: pd.DataFrame,
-    output_path: str | Path = Path(
-        "results/predictions/text_only_multinomial_nb_predictions.csv"
-    ),
+    output_path: str | Path = Path("results/predictions/text_only_multinomial_nb_predictions.csv"),
 ) -> Path:
     path = Path(output_path)
     ensure_dir(path.parent)
@@ -422,43 +275,20 @@ def save_predictions(
     return path
 
 
-def predict_manual_examples(model: Pipeline) -> pd.DataFrame:
-    examples = pd.DataFrame(MANUAL_EXAMPLES)
-    predicted_labels = model.predict(examples["text"])
-    probabilities = model.predict_proba(examples["text"])
-    confidences = probabilities.max(axis=1)
-
-    examples["predicted_label"] = predicted_labels
-    examples["predicted_confidence"] = confidences
-    examples["matched_expected_label"] = examples["expected_label"] == examples["predicted_label"]
-
-    return examples
-
-
-def save_manual_example_predictions(
-    predictions: pd.DataFrame,
-    output_path: str | Path = Path("results/predictions/manual_example_predictions.csv"),
+def save_classification_report(
+    report_df: pd.DataFrame,
+    output_path: str | Path,
 ) -> Path:
     path = Path(output_path)
     ensure_dir(path.parent)
-    predictions.to_csv(path, index=False)
-    return path
-
-
-def save_message_overlap_diagnostic(
-    metrics: dict,
-    output_path: str | Path = Path("results/metrics/message_overlap_diagnostic.json"),
-) -> Path:
-    path = Path(output_path)
-    ensure_dir(path.parent)
-    path.write_text(json.dumps(metrics["message_overlap_diagnostic"], indent=2), encoding="utf-8")
+    report_df.to_csv(path, index=False)
     return path
 
 
 def save_baseline_comparison_chart(
     nb_metrics: dict,
-    majority_metrics_path: str | Path = Path("results/metrics/majority_baseline.json"),
-    output_path: str | Path = Path("figures/text_only_model_comparison.png"),
+    majority_metrics_path: str | Path,
+    output_path: str | Path,
 ) -> Path:
     majority_path = Path(majority_metrics_path)
     if not majority_path.exists():
@@ -488,7 +318,7 @@ def save_baseline_comparison_chart(
         color=["#4C78A8", "#59A14F"],
         edgecolor="black",
     )
-    ax.set_title("Text-Only Model Comparison")
+    ax.set_title(f"Model Comparison: {nb_metrics['stage']}")
     ax.set_ylabel("Score")
     ax.set_ylim(0, 1)
     ax.tick_params(axis="x", rotation=0)
@@ -503,57 +333,46 @@ def save_baseline_comparison_chart(
     ensure_dir(path.parent)
     fig.savefig(path, dpi=300, bbox_inches="tight")
     plt.close(fig)
-
     return path
 
 
-def progress_report_sentence(metrics: dict) -> str:
-    return (
-        "The text-only TF-IDF bigram Multinomial Naive Bayes model achieved "
-        f"{metrics['accuracy']:.4f} accuracy and {metrics['macro_f1']:.4f} macro F1 "
-        "on the 20% stratified test split, improving over the majority-class baseline."
-    )
-
-
 def print_summary(metrics: dict) -> None:
-
     print("TF-IDF + Multinomial Naive Bayes Summary")
-    print(f"Total examples: {metrics['total_examples']}")
+    print(f"Stage: {metrics['stage']}")
+    print(f"Total examples: {metrics['total_examples_after_cleaning']}")
     print(f"Train size / test size: {metrics['train_size']} / {metrics['test_size']}")
     print(f"Accuracy: {metrics['accuracy']:.4f}")
     print(f"Macro F1: {metrics['macro_f1']:.4f}")
+    print(f"Weighted F1: {metrics['weighted_f1']:.4f}")
+    if "precision" in metrics:
+        print(f"Precision: {metrics['precision']:.4f}")
+        print(f"Recall: {metrics['recall']:.4f}")
+        print(f"F1: {metrics['f1']:.4f}")
 
 
 def main() -> None:
-
-    deduped_path = save_deduped_dataset()
-    df = load_dataset()
-    metrics, predictions, report_df, model = run_multinomial_nb(df, return_model=True)
-    manual_predictions = predict_manual_examples(model)
+    df = load_dataset(task="binary")
+    metrics, predictions, report_df = run_multinomial_nb(df, stage_name="stage1_binary")
 
     metrics_path = save_metrics(metrics)
     predictions_path = save_predictions(predictions)
-    manual_predictions_path = save_manual_example_predictions(manual_predictions)
-    overlap_path = save_message_overlap_diagnostic(metrics)
-    chart_path = save_baseline_comparison_chart(metrics)
+    report_path = save_classification_report(
+        report_df,
+        output_path=PROJECT_ROOT / "results" / "metrics" / "stage1_binary_text_only_multinomial_nb_report.csv",
+    )
+    confusion_path = save_confusion_matrix_plot(
+        metrics["confusion_matrix"],
+        output_path=PROJECT_ROOT / "figures" / "stage1_binary_text_only_multinomial_nb_confusion_matrix.png",
+        title="Stage 1 Binary Confusion Matrix",
+    )
 
     print_summary(metrics)
     print("\nClass-wise metrics:")
     print(report_df.to_string(index=False))
-    print("\nManual example sanity check:")
-    print(
-        manual_predictions[
-            ["example_id", "expected_label", "predicted_label", "predicted_confidence"]
-        ].to_string(index=False)
-    )
-    print(f"\nSaved deduped dataset to: {deduped_path}")
     print(f"\nSaved metrics to: {metrics_path}")
     print(f"Saved predictions to: {predictions_path}")
-    print(f"Saved manual example predictions to: {manual_predictions_path}")
-    print(f"Saved message overlap diagnostic to: {overlap_path}")
-    print(f"Saved comparison chart to: {chart_path}")
-    print()
-    print(progress_report_sentence(metrics))
+    print(f"Saved class report to: {report_path}")
+    print(f"Saved confusion matrix plot to: {confusion_path}")
 
 
 if __name__ == "__main__":
