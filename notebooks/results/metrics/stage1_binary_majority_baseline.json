@@ -4,7 +4,7 @@
   "data_source": "MentalManip with exact text deduplication before split",
   "target_column": "manipulation_type",
   "text_column": "text",
-  "random_seed": 42,
+  "random_seed": 16,
   "test_size_fraction": 0.2,
   "total_examples_before_deduplication": 4000,
   "duplicate_text_rows_removed_before_split": 0,

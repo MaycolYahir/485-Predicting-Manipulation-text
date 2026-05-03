@@ -289,6 +289,7 @@ def save_baseline_comparison_chart(
     nb_metrics: dict,
     majority_metrics_path: str | Path,
     output_path: str | Path,
+    bert_metrics: dict | None = None,
 ) -> Path:
     majority_path = Path(majority_metrics_path)
     if not majority_path.exists():
@@ -296,20 +297,32 @@ def save_baseline_comparison_chart(
 
     majority_metrics = json.loads(majority_path.read_text(encoding="utf-8"))
 
-    comparison = pd.DataFrame(
-        [
+    comparison_rows = [
+        {
+            "model": "Majority baseline",
+            "accuracy": majority_metrics["accuracy"],
+            "macro_f1": majority_metrics["macro_f1"],
+        },
+        {
+            "model": "TF-IDF + MultinomialNB",
+            "accuracy": nb_metrics["accuracy"],
+            "macro_f1": nb_metrics["macro_f1"],
+        },
+    ]
+    if bert_metrics is not None:
+        transformer_name = str(bert_metrics.get("model_name", "BERT")).lower()
+        transformer_label = (
+            "DistilBERT" if "distilbert" in transformer_name else "BERT classifier"
+        )
+        comparison_rows.append(
             {
-                "model": "Majority baseline",
-                "accuracy": majority_metrics["accuracy"],
-                "macro_f1": majority_metrics["macro_f1"],
-            },
-            {
-                "model": "TF-IDF + MultinomialNB",
-                "accuracy": nb_metrics["accuracy"],
-                "macro_f1": nb_metrics["macro_f1"],
-            },
-        ]
-    )
+                "model": transformer_label,
+                "accuracy": bert_metrics["accuracy"],
+                "macro_f1": bert_metrics["macro_f1"],
+            }
+        )
+
+    comparison = pd.DataFrame(comparison_rows)
 
     fig, ax = plt.subplots(figsize=(8, 5))
     comparison.set_index("model")[["accuracy", "macro_f1"]].plot(

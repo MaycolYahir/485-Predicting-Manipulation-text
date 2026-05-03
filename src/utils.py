@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 
 LABEL_COLUMN = "manipulation_type"
 TEXT_COLUMN = "text"
-RANDOM_STATE = 42
+RANDOM_STATE = 16
 TEST_SIZE = 0.2
 OTHER_LABEL = "OTHER"
 
