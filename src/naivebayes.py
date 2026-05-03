@@ -312,7 +312,7 @@ def save_baseline_comparison_chart(
     if bert_metrics is not None:
         transformer_name = str(bert_metrics.get("model_name", "BERT")).lower()
         transformer_label = (
-            "DistilBERT" if "distilbert" in transformer_name else "BERT classifier"
+            "DistilBERT" if "distilbert" in transformer_name else "BERT"
         )
         comparison_rows.append(
             {

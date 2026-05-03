@@ -60,6 +60,7 @@ DEFAULT_WEIGHT_DECAY = 0.01
 DEFAULT_TRAIN_BATCH_SIZE = 16
 DEFAULT_EVAL_BATCH_SIZE = 16
 DEFAULT_RARE_LABEL_MIN_COUNT: int | None = None
+DEFAULT_USE_CLASS_WEIGHTS = False
 
 
 @dataclass
@@ -95,6 +96,22 @@ class TextClassificationDataset(Dataset):
         return item
 
 
+class WeightedLossTrainer(Trainer):
+    """Trainer variant that applies inverse-frequency class weights."""
+
+    def __init__(self, *args, class_weights: torch.Tensor, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.class_weights = class_weights
+
+    def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+        labels = inputs.pop("labels")
+        outputs = model(**inputs)
+        logits = outputs.get("logits")
+        loss_fct = torch.nn.CrossEntropyLoss(weight=self.class_weights.to(logits.device))
+        loss = loss_fct(logits.view(-1, model.config.num_labels), labels.view(-1))
+        return (loss, outputs) if return_outputs else loss
+
+
 def validate_dataframe(df: pd.DataFrame) -> str:
 
     if LABEL_COLUMN not in df.columns:
@@ -116,6 +133,17 @@ def build_label_encoder(labels: pd.Series) -> LabelEncoderBundle:
 
 def encode_labels(labels: pd.Series, encoder: LabelEncoderBundle) -> list[int]:
     return [encoder.label_to_id[str(label)] for label in labels.astype(str).tolist()]
+
+
+def compute_balanced_class_weights(label_ids: list[int], num_labels: int) -> torch.Tensor:
+    counts = np.bincount(label_ids, minlength=num_labels)
+    if (counts == 0).any():
+        missing = np.where(counts == 0)[0].tolist()
+        raise ValueError(f"Cannot compute class weights; missing class ids in training data: {missing}")
+
+    total = counts.sum()
+    weights = total / (num_labels * counts)
+    return torch.tensor(weights, dtype=torch.float)
 
 
 def classification_report_table(y_true: list[str], y_pred: list[str]) -> pd.DataFrame:
@@ -250,6 +278,7 @@ def run_bert_classifier(
     per_device_train_batch_size: int = DEFAULT_TRAIN_BATCH_SIZE,
     per_device_eval_batch_size: int = DEFAULT_EVAL_BATCH_SIZE,
     rare_label_min_count: int | None = None,
+    use_class_weights: bool = DEFAULT_USE_CLASS_WEIGHTS,
     output_dir: str | Path | None = None,
 ) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
    
@@ -309,7 +338,19 @@ def run_bert_classifier(
         device=device,
     )
 
-    trainer = Trainer(
+    class_weights = None
+    if use_class_weights:
+        class_weights = compute_balanced_class_weights(
+            train_label_ids,
+            num_labels=len(encoder.label_to_id),
+        )
+        trainer_class = WeightedLossTrainer
+        trainer_kwargs = {"class_weights": class_weights}
+    else:
+        trainer_class = Trainer
+        trainer_kwargs = {}
+
+    trainer = trainer_class(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
@@ -317,6 +358,7 @@ def run_bert_classifier(
         processing_class=tokenizer,
         data_collator=data_collator,
         compute_metrics=_trainer_metrics,
+        **trainer_kwargs,
     )
 
     if device == "cpu":
@@ -355,6 +397,15 @@ def run_bert_classifier(
         "weight_decay": float(weight_decay),
         "per_device_train_batch_size": int(per_device_train_batch_size),
         "per_device_eval_batch_size": int(per_device_eval_batch_size),
+        "use_class_weights": bool(use_class_weights),
+        "class_weights": (
+            {
+                encoder.id_to_label[index]: float(weight)
+                for index, weight in enumerate(class_weights.tolist())
+            }
+            if class_weights is not None
+            else None
+        ),
         "accuracy": float(accuracy_score(true_labels, predicted_labels)),
         "macro_f1": float(f1_score(true_labels, predicted_labels, average="macro", zero_division=0)),
         "weighted_f1": float(
@@ -441,6 +492,7 @@ def print_summary(metrics: dict) -> None:
     print(f"Accuracy: {metrics['accuracy']:.4f}")
     print(f"Macro F1: {metrics['macro_f1']:.4f}")
     print(f"Weighted F1: {metrics['weighted_f1']:.4f}")
+    print(f"Class weights: {metrics['use_class_weights']}")
     if "precision" in metrics:
         print(f"Precision: {metrics['precision']:.4f}")
         print(f"Recall: {metrics['recall']:.4f}")
